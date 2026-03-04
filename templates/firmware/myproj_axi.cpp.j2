@@ -1,0 +1,71 @@
+#include "rfr_common.h"
+#include "rf_trees_array.h"
+#include "bitcast_utils.h"
+#include <hls_stream.h>
+
+// ========================== Dataflow Helper Functions ==========================
+void read_input_stream(hls::stream<input_axi_t>& in, hls::stream<input_t>& in_local, hls::stream<input_axi_t>& last_word_stream) {
+#pragma HLS INLINE off
+
+    input_t input_sample;
+#pragma HLS ARRAY_PARTITION variable=input_sample.data complete dim=1
+    input_axi_t last_word;
+
+    // Read N_FEATURES words - optimized with burst hint
+    for (unsigned j = 0; j < N_FEATURES; ++j) {
+#pragma HLS PIPELINE II=1
+        input_axi_t word = in.read();
+        input_sample.data[j].range(15, 0) = word.data.range(15, 0);
+        if (j == N_FEATURES - 1)
+            last_word = word; // capture last word only
+    }
+    in_local.write(input_sample);
+    last_word_stream.write(last_word);
+}
+
+void process_prediction(hls::stream<input_t>& in_local, hls::stream<result_t>& out_local) {
+#pragma HLS INLINE off
+
+    input_t input_data = in_local.read();
+    result_t output_sample;
+    predict_array(input_data, output_sample);
+    out_local.write(output_sample);
+}
+
+void write_output_stream(hls::stream<result_t>& out_local, hls::stream<input_axi_t>& last_word_stream, hls::stream<output_axi_t>& out) {
+#pragma HLS INLINE off
+
+    result_t result = out_local.read();
+    input_axi_t last_word = last_word_stream.read();
+
+    // Write output - optimized
+    for (unsigned j = 0; j < N_TARGETS; ++j) {
+#pragma HLS PIPELINE II=1
+        output_axi_t pkt;
+        pkt.data = 0;
+        pkt.data.range(15, 0) = result.data[j].range(15, 0);
+        pkt.last = (last_word.last && j == N_TARGETS - 1) ? 1 : 0;
+        pkt.keep = 0xF;
+        pkt.strb = 0xF;
+        out << pkt;
+    }
+}
+
+// ========================== Top-Level AXI Stream Function ==========================
+void predict_axi(hls::stream<input_axi_t>& in, hls::stream<output_axi_t>& out) {
+#pragma HLS INTERFACE axis port=in
+#pragma HLS INTERFACE axis port=out
+#pragma HLS INTERFACE ap_ctrl_none port=return
+#pragma HLS DATAFLOW
+
+    hls::stream<input_t> in_local("input_1");
+    hls::stream<result_t> out_local("output_1");
+    hls::stream<input_axi_t> last_word_stream("last_word");
+#pragma HLS STREAM variable=in_local depth=2
+#pragma HLS STREAM variable=out_local depth=2
+#pragma HLS STREAM variable=last_word_stream depth=2
+
+    read_input_stream(in, in_local, last_word_stream);
+    process_prediction(in_local, out_local);
+    write_output_stream(out_local, last_word_stream, out);
+}

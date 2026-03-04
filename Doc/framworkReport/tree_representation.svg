@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1395.813 905.30695"
+   version="1.1"
+   id="svg71"
+   sodipodi:docname="tree_representation.svg"
+   width="1395.813"
+   height="905.30695"
+   inkscape:export-filename="framworkReport\tree_representation.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs71" />
+  <sodipodi:namedview
+     id="namedview71"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.63403908"
+     inkscape:cx="819.35013"
+     inkscape:cy="519.68405"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="optimized" />
+  <rect
+     style="fill:#ffffff;stroke-width:2.163;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1.87109, 1.87109"
+     id="rect71"
+     width="1395.813"
+     height="905.30695"
+     x="0"
+     y="0"
+     rx="8" />
+  <!-- Title -->
+  <text
+     x="696.84564"
+     y="35"
+     font-size="22px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text1">Optimized Tree Representation for FPGA Implementation</text>
+  <!-- Left Side: Traditional Tree Structure -->
+  <g
+     id="traditional"
+     transform="translate(-3.1543796)">
+    <text
+       x="300"
+       y="80"
+       font-size="18px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#e74c3c"
+       id="text2">Traditional: Recursive Structure</text>
+    <!-- Tree visualization -->
+    <circle
+       cx="300"
+       cy="130"
+       r="35"
+       fill="#3498db"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="circle2" />
+    <text
+       x="300"
+       y="138"
+       font-size="11px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text3">feat[2]</text>
+    <text
+       x="300"
+       y="152"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text4">&lt; 0.5</text>
+    <!-- Left branch -->
+    <line
+       x1="275"
+       y1="160"
+       x2="200"
+       y2="220"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="line4" />
+    <circle
+       cx="200"
+       cy="240"
+       r="30"
+       fill="#9b59b6"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="circle4" />
+    <text
+       x="200"
+       y="246"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text5">feat[0]</text>
+    <text
+       x="200"
+       y="258"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text6">&lt; 0.3</text>
+    <!-- Right branch -->
+    <line
+       x1="325"
+       y1="160"
+       x2="400"
+       y2="220"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="line6" />
+    <circle
+       cx="400"
+       cy="240"
+       r="30"
+       fill="#9b59b6"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="circle6" />
+    <text
+       x="400"
+       y="246"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text7">feat[1]</text>
+    <text
+       x="400"
+       y="258"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text8">&lt; 0.7</text>
+    <!-- Leaf nodes -->
+    <line
+       x1="185"
+       y1="268"
+       x2="150"
+       y2="320"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="line8" />
+    <rect
+       x="130"
+       y="320"
+       width="40"
+       height="30"
+       fill="#27ae60"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="5"
+       id="rect8" />
+    <text
+       x="150"
+       y="340"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text9">0.23</text>
+    <line
+       x1="215"
+       y1="268"
+       x2="250"
+       y2="320"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="line9" />
+    <rect
+       x="230"
+       y="320"
+       width="40"
+       height="30"
+       fill="#27ae60"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="5"
+       id="rect9" />
+    <text
+       x="250"
+       y="340"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text10">0.87</text>
+    <line
+       x1="385"
+       y1="268"
+       x2="350"
+       y2="320"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="line10" />
+    <rect
+       x="330"
+       y="320"
+       width="40"
+       height="30"
+       fill="#27ae60"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="5"
+       id="rect10" />
+    <text
+       x="350"
+       y="340"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text11">0.45</text>
+    <line
+       x1="415"
+       y1="268"
+       x2="450"
+       y2="320"
+       stroke="#2c3e50"
+       stroke-width="2"
+       id="line11" />
+    <rect
+       x="430"
+       y="320"
+       width="40"
+       height="30"
+       fill="#27ae60"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="5"
+       id="rect11" />
+    <text
+       x="450"
+       y="340"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text12">0.91</text>
+    <!-- Problems -->
+    <rect
+       x="120"
+       y="380"
+       width="360"
+       height="120"
+       fill="#ffe6e6"
+       stroke="#e74c3c"
+       stroke-width="2"
+       rx="8"
+       id="rect12" />
+    <text
+       x="300"
+       y="405"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#c0392b"
+       id="text13">❌ Implementation Problems</text>
+    <text
+       x="140"
+       y="430"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text14">• Recursive calls → Pipeline stalls</text>
+    <text
+       x="140"
+       y="450"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text15">• Pointer chasing → High latency</text>
+    <text
+       x="140"
+       y="470"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text16">• Variable memory access patterns</text>
+    <text
+       x="140"
+       y="490"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text17">• Difficult to parallelize</text>
+  </g>
+  <!-- Right Side: Our Flat Array Approach -->
+  <g
+     id="optimized"
+     transform="translate(-3.1543796)">
+    <text
+       x="1000"
+       y="80"
+       font-size="18px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#27ae60"
+       id="text18">MY Approach: Flat Array Structure</text>
+    <!-- Array Tables -->
+    <!-- Features Array -->
+    <g
+       id="features_array">
+      <rect
+         x="750"
+         y="110"
+         width="500"
+         height="50"
+         fill="#3498db"
+         stroke="#2c3e50"
+         stroke-width="2"
+         rx="5"
+         id="rect18" />
+      <text
+         x="810"
+         y="138"
+         font-size="12px"
+         font-weight="bold"
+         fill="#ffffff"
+         id="text19">features[]</text>
+      <rect
+         x="890"
+         y="115"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect19" />
+      <text
+         x="915"
+         y="133"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text20">0:2</text>
+      <text
+         x="915"
+         y="147"
+         font-size="9px"
+         text-anchor="middle"
+         fill="#7f8c8d"
+         id="text21">idx=0</text>
+      <rect
+         x="940"
+         y="115"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect21" />
+      <text
+         x="965"
+         y="133"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text22">1:0</text>
+      <text
+         x="965"
+         y="147"
+         font-size="9px"
+         text-anchor="middle"
+         fill="#7f8c8d"
+         id="text23">idx=1</text>
+      <rect
+         x="990"
+         y="115"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect23" />
+      <text
+         x="1015"
+         y="133"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text24">2:1</text>
+      <text
+         x="1015"
+         y="147"
+         font-size="9px"
+         text-anchor="middle"
+         fill="#7f8c8d"
+         id="text25">idx=2</text>
+      <rect
+         x="1040"
+         y="115"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect25" />
+      <text
+         x="1065"
+         y="133"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text26">-1</text>
+      <text
+         x="1065"
+         y="147"
+         font-size="9px"
+         text-anchor="middle"
+         fill="#7f8c8d"
+         id="text27">leaf</text>
+      <text
+         x="1110"
+         y="138"
+         font-size="10px"
+         fill="#7f8c8d"
+         id="text28">...</text>
+    </g>
+    <!-- Thresholds Array -->
+    <g
+       id="thresholds_array">
+      <rect
+         x="750"
+         y="180"
+         width="500"
+         height="50"
+         fill="#9b59b6"
+         stroke="#2c3e50"
+         stroke-width="2"
+         rx="5"
+         id="rect28" />
+      <text
+         x="810"
+         y="208"
+         font-size="12px"
+         font-weight="bold"
+         fill="#ffffff"
+         id="text29">thresholds[]</text>
+      <rect
+         x="890"
+         y="185"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect29" />
+      <text
+         x="915"
+         y="210"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text30">0.50</text>
+      <rect
+         x="940"
+         y="185"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect30" />
+      <text
+         x="965"
+         y="210"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text31">0.30</text>
+      <rect
+         x="990"
+         y="185"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect31" />
+      <text
+         x="1015"
+         y="210"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text32">0.70</text>
+      <rect
+         x="1040"
+         y="185"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect32" />
+      <text
+         x="1065"
+         y="210"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text33">-</text>
+      <text
+         x="1110"
+         y="208"
+         font-size="10px"
+         fill="#7f8c8d"
+         id="text34">...</text>
+    </g>
+    <!-- Values Array -->
+    <g
+       id="values_array">
+      <rect
+         x="750"
+         y="250"
+         width="500"
+         height="50"
+         fill="#27ae60"
+         stroke="#2c3e50"
+         stroke-width="2"
+         rx="5"
+         id="rect34" />
+      <text
+         x="810"
+         y="278"
+         font-size="12px"
+         font-weight="bold"
+         fill="#ffffff"
+         id="text35">node_values[]</text>
+      <rect
+         x="890"
+         y="255"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect35" />
+      <text
+         x="915"
+         y="280"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text36">-</text>
+      <rect
+         x="940"
+         y="255"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect36" />
+      <text
+         x="965"
+         y="280"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text37">-</text>
+      <rect
+         x="990"
+         y="255"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect37" />
+      <text
+         x="1015"
+         y="280"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text38">-</text>
+      <rect
+         x="1040"
+         y="255"
+         width="50"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect38" />
+      <text
+         x="1065"
+         y="280"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text39">0.23</text>
+      <text
+         x="1110"
+         y="278"
+         font-size="10px"
+         fill="#7f8c8d"
+         id="text40">...</text>
+    </g>
+    <!-- Children Arrays -->
+    <g
+       id="children_arrays">
+      <rect
+         x="750"
+         y="320"
+         width="240"
+         height="50"
+         fill="#e67e22"
+         stroke="#2c3e50"
+         stroke-width="2"
+         rx="5"
+         id="rect40" />
+      <text
+         x="810"
+         y="348"
+         font-size="12px"
+         font-weight="bold"
+         fill="#ffffff"
+         id="text41">left[]</text>
+      <rect
+         x="890"
+         y="325"
+         width="35"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect41" />
+      <text
+         x="907"
+         y="350"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text42">1</text>
+      <rect
+         x="925"
+         y="325"
+         width="35"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect42" />
+      <text
+         x="942"
+         y="350"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text43">3</text>
+      <rect
+         x="960"
+         y="325"
+         width="35"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect43" />
+      <text
+         x="977"
+         y="350"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text44">5</text>
+      <rect
+         x="1010"
+         y="320"
+         width="240"
+         height="50"
+         fill="#e67e22"
+         stroke="#2c3e50"
+         stroke-width="2"
+         rx="5"
+         id="rect44" />
+      <text
+         x="1070"
+         y="348"
+         font-size="12px"
+         font-weight="bold"
+         fill="#ffffff"
+         id="text45">right[]</text>
+      <rect
+         x="1150"
+         y="325"
+         width="35"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect45" />
+      <text
+         x="1167"
+         y="350"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text46">2</text>
+      <rect
+         x="1185"
+         y="325"
+         width="35"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect46" />
+      <text
+         x="1202"
+         y="350"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text47">4</text>
+      <rect
+         x="1220"
+         y="325"
+         width="35"
+         height="40"
+         fill="#ffffff"
+         stroke="#2c3e50"
+         stroke-width="1"
+         id="rect47" />
+      <text
+         x="1237"
+         y="350"
+         font-size="10px"
+         text-anchor="middle"
+         fill="#2c3e50"
+         id="text48">6</text>
+    </g>
+    <!-- Traversal Example -->
+    <rect
+       x="750"
+       y="390"
+       width="500"
+       height="110"
+       fill="#e8f5e9"
+       stroke="#27ae60"
+       stroke-width="2"
+       rx="8"
+       id="rect48" />
+    <text
+       x="1000"
+       y="415"
+       font-size="13px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#1b5e20"
+       id="text49">✅ Traversal Algorithm (Single Cycle)</text>
+    <text
+       x="760"
+       y="440"
+       font-size="10px"
+       font-family="monospace"
+       fill="#2c3e50"
+       id="text50">int idx = 0; // Start at root</text>
+    <text
+       x="760"
+       y="458"
+       font-size="10px"
+       font-family="monospace"
+       fill="#2c3e50"
+       id="text51">while (features[idx] != -1) { // Not a leaf</text>
+    <text
+       x="770"
+       y="476"
+       font-size="10px"
+       font-family="monospace"
+       fill="#2c3e50"
+       id="text52">bool go_left = (x[features[idx]] &lt; thresholds[idx]);</text>
+    <text
+       x="770"
+       y="492"
+       font-size="10px"
+       font-family="monospace"
+       fill="#2c3e50"
+       id="text53">idx = go_left ? left[idx] : right[idx];</text>
+    <text
+       x="760"
+       y="508"
+       font-size="10px"
+       font-family="monospace"
+       fill="#2c3e50"
+       id="text54">}</text>
+  </g>
+  <!-- Benefits Section -->
+  <rect
+     x="746.84564"
+     y="520"
+     width="500"
+     height="140"
+     fill="#fff3cd"
+     stroke="#f39c12"
+     stroke-width="2"
+     rx="8"
+     id="rect54" />
+  <text
+     x="996.84564"
+     y="545"
+     font-size="14px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#8b6914"
+     id="text55">🚀 Key Advantages</text>
+  <text
+     x="766.84564"
+     y="570"
+     font-size="11px"
+     fill="#2c3e50"
+     id="text56"><tspan
+   font-weight="bold"
+   id="tspan55">✓ BRAM Efficiency:</tspan> Consecutive memory access → Block RAM packing</text>
+  <text
+     x="766.84564"
+     y="590"
+     font-size="11px"
+     fill="#2c3e50"
+     id="text57"><tspan
+   font-weight="bold"
+   id="tspan56">✓ Predictable Latency:</tspan> Max depth bounds worst-case cycles</text>
+  <text
+     x="766.84564"
+     y="610"
+     font-size="11px"
+     fill="#2c3e50"
+     id="text58"><tspan
+   font-weight="bold"
+   id="tspan57">✓ Pipeline Friendly:</tspan> Array indexing enables loop pipelining</text>
+  <text
+     x="766.84564"
+     y="630"
+     font-size="11px"
+     fill="#2c3e50"
+     id="text59"><tspan
+   font-weight="bold"
+   id="tspan58">✓ Parallel Trees:</tspan> Independent tree evaluation in parallel</text>
+  <text
+     x="766.84564"
+     y="650"
+     font-size="11px"
+     fill="#2c3e50"
+     id="text60"><tspan
+   font-weight="bold"
+   id="tspan59">✓ No Recursion:</tspan> Iterative loop → Single function call</text>
+  <!-- Memory Layout Visualization -->
+  <text
+     x="696.84564"
+     y="710"
+     font-size="16px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text61">BRAM Memory Layout (MAX_NODES = 128)</text>
+  <rect
+     x="96.845619"
+     y="730"
+     width="1200"
+     height="80"
+     fill="#34495e"
+     stroke="#2c3e50"
+     stroke-width="2"
+     rx="5"
+     id="rect61" />
+  <!-- Memory segments -->
+  <rect
+     x="106.84562"
+     y="740"
+     width="280"
+     height="60"
+     fill="#3498db"
+     stroke="#ffffff"
+     stroke-width="1"
+     id="rect62" />
+  <text
+     x="246.84563"
+     y="765"
+     font-size="12px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text62">Tree 0</text>
+  <text
+     x="246.84563"
+     y="785"
+     font-size="10px"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text63">5 arrays × 128 nodes</text>
+  <rect
+     x="396.84561"
+     y="740"
+     width="280"
+     height="60"
+     fill="#9b59b6"
+     stroke="#ffffff"
+     stroke-width="1"
+     id="rect63" />
+  <text
+     x="536.84564"
+     y="765"
+     font-size="12px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text64">Tree 1</text>
+  <text
+     x="536.84564"
+     y="785"
+     font-size="10px"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text65">5 arrays × 128 nodes</text>
+  <rect
+     x="686.84564"
+     y="740"
+     width="280"
+     height="60"
+     fill="#e74c3c"
+     stroke="#ffffff"
+     stroke-width="1"
+     id="rect65" />
+  <text
+     x="826.84564"
+     y="765"
+     font-size="12px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text66">Tree 2</text>
+  <text
+     x="826.84564"
+     y="785"
+     font-size="10px"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text67">5 arrays × 128 nodes</text>
+  <rect
+     x="976.84564"
+     y="740"
+     width="280"
+     height="60"
+     fill="#27ae60"
+     stroke="#ffffff"
+     stroke-width="1"
+     id="rect67" />
+  <text
+     x="1116.8456"
+     y="765"
+     font-size="12px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text68">... Tree N</text>
+  <text
+     x="1116.8456"
+     y="785"
+     font-size="10px"
+     text-anchor="middle"
+     fill="#ffffff"
+     id="text69">N = 20 estimators</text>
+  <!-- Bottom annotations -->
+  <text
+     x="696.84564"
+     y="840"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text70">Each tree stored in contiguous BRAM blocks → Minimizes memory port conflicts</text>
+  <text
+     x="696.84564"
+     y="870"
+     font-size="12px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text71">Total Memory: 20 trees × 5 arrays × 128 nodes × 16 bits = 126 BRAM_18K blocks (45% utilization)</text>
+</svg>

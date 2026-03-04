@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1201.4869 814.86987"
+   version="1.1"
+   id="svg53"
+   sodipodi:docname="pipeline_diagram.svg"
+   width="1201.4869"
+   height="814.86987"
+   inkscape:export-filename="framworkReport\pipeline_diagram.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview53"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.504375"
+     inkscape:cx="241.88352"
+     inkscape:cy="343.99009"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg53" />
+  <rect
+     style="fill:#ffffff;stroke-width:2.15505;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1.86421, 1.86421"
+     id="rect53"
+     width="1201.4869"
+     height="814.86987"
+     x="0"
+     y="0"
+     rx="7.8446603" />
+  <!-- Title -->
+  <text
+     x="600"
+     y="33.965302"
+     font-size="24px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text1">Random Forest FPGA Acceleration Pipeline</text>
+  <!-- Stage 1: Python/Training -->
+  <g
+     id="stage1"
+     transform="translate(0,3.9653034)">
+    <rect
+       x="50"
+       y="80"
+       width="200"
+       height="120"
+       fill="#3498db"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="10"
+       id="rect1" />
+    <text
+       x="150"
+       y="110"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text2">Stage 1: Training</text>
+    <text
+       x="150"
+       y="135"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text3">• Load Dataset</text>
+    <text
+       x="150"
+       y="155"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text4">• Train RF Model</text>
+    <text
+       x="150"
+       y="175"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text5">• MinMax Scaling</text>
+    <text
+       x="150"
+       y="195"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text6">• Save Model (.pkl)</text>
+  </g>
+  <!-- Arrow 1 -->
+  <path
+     d="m 250,143.9653 h 70"
+     stroke="#34495e"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path6" />
+  <text
+     x="254.26889"
+     y="129.00868"
+     font-size="11px"
+     fill="#7f8c8d"
+     id="text7"
+     style="fill:#000000;fill-opacity:1">scikit-learn</text>
+  <!-- Stage 2: Tree Extraction -->
+  <g
+     id="stage2"
+     transform="translate(0,3.9653034)">
+    <rect
+       x="320"
+       y="80"
+       width="200"
+       height="120"
+       fill="#9b59b6"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="10"
+       id="rect7" />
+    <text
+       x="420"
+       y="110"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text8">Stage 2: Extraction</text>
+    <text
+       x="420"
+       y="135"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text9">• Parse Trees</text>
+    <text
+       x="420"
+       y="155"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text10">• Extract Thresholds</text>
+    <text
+       x="420"
+       y="175"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text11">• Flatten Structure</text>
+    <text
+       x="420"
+       y="195"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text12">• Pad to MAX_NODES</text>
+  </g>
+  <!-- Arrow 2 -->
+  <path
+     d="m 520,143.9653 h 70"
+     stroke="#34495e"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path12" />
+  <text
+     x="533.19086"
+     y="127.02602"
+     font-size="11px"
+     fill="#7f8c8d"
+     id="text13"
+     style="fill:#000000;fill-opacity:1">Python</text>
+  <!-- Stage 3: Code Generation -->
+  <g
+     id="stage3"
+     transform="translate(0,3.9653034)">
+    <rect
+       x="590"
+       y="80"
+       width="200"
+       height="120"
+       fill="#e74c3c"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="10"
+       id="rect13" />
+    <text
+       x="690"
+       y="110"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text14">Stage 3: Code Gen</text>
+    <text
+       x="690"
+       y="135"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text15">• Jinja2 Templates</text>
+    <text
+       x="690"
+       y="155"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text16">• Generate HLS C++</text>
+    <text
+       x="690"
+       y="175"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text17">• Insert Pragmas</text>
+    <text
+       x="690"
+       y="195"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text18">• Create Testbench</text>
+  </g>
+  <!-- Arrow 3 -->
+  <path
+     d="m 790,143.9653 h 70"
+     stroke="#34495e"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path18" />
+  <text
+     x="797.24286"
+     y="125.04336"
+     font-size="11px"
+     fill="#7f8c8d"
+     id="text19"
+     style="fill:#000000;fill-opacity:1">C++/HLS</text>
+  <!-- Stage 4: HLS Synthesis -->
+  <g
+     id="stage4"
+     transform="translate(0,3.9653034)">
+    <rect
+       x="860"
+       y="80"
+       width="200"
+       height="120"
+       fill="#16a085"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="10"
+       id="rect19" />
+    <text
+       x="960"
+       y="110"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text20">Stage 4: Synthesis</text>
+    <text
+       x="960"
+       y="135"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text21">• C Simulation</text>
+    <text
+       x="960"
+       y="155"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text22">• HLS Synthesis</text>
+    <text
+       x="960"
+       y="175"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text23">• Co-Simulation</text>
+    <text
+       x="960"
+       y="195"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text24">• IP Export</text>
+  </g>
+  <!-- Vertical Arrow Down -->
+  <path
+     d="m 960,203.9653 v 70"
+     stroke="#34495e"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path24" />
+  <text
+     x="980"
+     y="238.9653"
+     font-size="11px"
+     fill="#7f8c8d"
+     id="text25"
+     style="fill:#000000;fill-opacity:1">Vivado HLS</text>
+  <!-- Stage 5: FPGA Implementation -->
+  <g
+     id="stage5"
+     transform="translate(0,3.9653034)">
+    <rect
+       x="860"
+       y="270"
+       width="200"
+       height="120"
+       fill="#f39c12"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="10"
+       id="rect25" />
+    <text
+       x="960"
+       y="300"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text26">Stage 5: FPGA Deploy</text>
+    <text
+       x="960"
+       y="325"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text27">• Place Route</text>
+    <text
+       x="960"
+       y="345"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text28">• Generate Bitstream</text>
+    <text
+       x="960"
+       y="365"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text29">• AXI Integration</text>
+    <text
+       x="960"
+       y="385"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text30">• DMA Setup</text>
+  </g>
+  <!-- Feedback Arrow (Verification) -->
+  <path
+     d="M 860,333.9653 H 700 v 120 H 150 v -250"
+     stroke="#e74c3c"
+     stroke-width="2"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     stroke-dasharray="5, 5"
+     id="path30" />
+  <text
+     x="500"
+     y="473.9653"
+     font-size="12px"
+     fill="#e74c3c"
+     font-weight="bold"
+     id="text31">Verification Loop</text>
+  <!-- Bottom Section: Key Metrics -->
+  <rect
+     x="50"
+     y="523.96533"
+     width="1100"
+     height="220"
+     fill="#ecf0f1"
+     stroke="#2c3e50"
+     stroke-width="2"
+     rx="10"
+     id="rect31" />
+  <text
+     x="600"
+     y="553.96533"
+     font-size="18px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text32">Performance Resource Metrics</text>
+  <!-- Metrics Grid -->
+  <g
+     id="metrics"
+     transform="translate(0,3.9653034)">
+    <!-- Throughput -->
+    <rect
+       x="80"
+       y="570"
+       width="240"
+       height="150"
+       fill="#ffffff"
+       stroke="#3498db"
+       stroke-width="2"
+       rx="5"
+       id="rect32" />
+    <text
+       x="200"
+       y="595"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#3498db"
+       id="text33">Throughput</text>
+    <text
+       x="200"
+       y="625"
+       font-size="24px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#2c3e50"
+       id="text34">1.67M</text>
+    <text
+       x="200"
+       y="650"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text35"
+       style="fill:#000000;fill-opacity:1">predictions/sec</text>
+    <text
+       x="200"
+       y="680"
+       font-size="11px"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text36"
+       style="fill:#000000;fill-opacity:1">Latency: 600 ns</text>
+    <text
+       x="200"
+       y="700"
+       font-size="11px"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text37"
+       style="fill:#000000;fill-opacity:1">Clock: 100 MHz</text>
+  </g>
+  <!-- Accuracy -->
+  <rect
+     x="350"
+     y="573.96533"
+     width="240"
+     height="150"
+     fill="#ffffff"
+     stroke="#9b59b6"
+     stroke-width="2"
+     rx="5"
+     id="rect37" />
+  <text
+     x="470"
+     y="598.96533"
+     font-size="14px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#9b59b6"
+     id="text38">Accuracy</text>
+  <text
+     x="470"
+     y="628.96533"
+     font-size="24px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text39">R² = 0.9991</text>
+  <text
+     x="470"
+     y="653.96533"
+     font-size="12px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text40"
+     style="fill:#000000;fill-opacity:1">MAE: 0.0417</text>
+  <text
+     x="470"
+     y="683.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text41"
+     style="fill:#000000;fill-opacity:1">Python vs HLS</text>
+  <text
+     x="470"
+     y="703.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text42"
+     style="fill:#000000;fill-opacity:1">3464 test samples</text>
+  <!-- Resource Utilization -->
+  <rect
+     x="620"
+     y="573.96533"
+     width="240"
+     height="150"
+     fill="#ffffff"
+     stroke="#16a085"
+     stroke-width="2"
+     rx="5"
+     id="rect42" />
+  <text
+     x="740"
+     y="598.96533"
+     font-size="14px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#16a085"
+     id="text43">Resources</text>
+  <text
+     x="740"
+     y="628.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text44"
+     style="fill:#000000;fill-opacity:1">BRAM: 45% | LUT: 6%</text>
+  <text
+     x="740"
+     y="648.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text45"
+     style="fill:#000000;fill-opacity:1">FF: 4% | DSP: 2%</text>
+  <text
+     x="740"
+     y="683.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text46"
+     style="fill:#000000;fill-opacity:1">126 BRAM_18K</text>
+  <text
+     x="740"
+     y="703.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text47"
+     style="fill:#000000;fill-opacity:1">3594 LUTs, 6 DSPs</text>
+  <!-- Precision -->
+  <rect
+     x="890"
+     y="573.96533"
+     width="240"
+     height="150"
+     fill="#ffffff"
+     stroke="#e74c3c"
+     stroke-width="2"
+     rx="5"
+     id="rect47" />
+  <text
+     x="1010"
+     y="598.96533"
+     font-size="14px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#e74c3c"
+     id="text48">Precision</text>
+  <text
+     x="1010"
+     y="628.96533"
+     font-size="20px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text49">ap_fixed16,6</text>
+  <text
+     x="1010"
+     y="653.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text50"
+     style="fill:#000000;fill-opacity:1">16-bit total width</text>
+  <text
+     x="1010"
+     y="673.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text51"
+     style="fill:#000000;fill-opacity:1">6-bit integer part</text>
+  <text
+     x="1010"
+     y="693.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text52"
+     style="fill:#000000;fill-opacity:1">10-bit fractional</text>
+  <text
+     x="1010"
+     y="713.96533"
+     font-size="11px"
+     text-anchor="middle"
+     fill="#7f8c8d"
+     id="text53"
+     style="fill:#000000;fill-opacity:1">Range: [-32, 31.999]</text>
+  <!-- Arrow marker definition -->
+  <defs
+     id="defs53">
+    <marker
+       id="arrowhead"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="3"
+       orient="auto">
+      <polygon
+         points="10,3 0,6 0,0 "
+         fill="#34495e"
+         id="polygon53" />
+    </marker>
+  </defs>
+</svg>

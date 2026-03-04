@@ -1,0 +1,74 @@
+#ifndef RFR_COMMON_H
+#define RFR_COMMON_H
+
+#include <ap_fixed.h>
+#include <ap_int.h>
+#include <hls_stream.h>
+#include <ap_axi_sdata.h>
+
+// --------------------------------------------------
+// Constants
+// --------------------------------------------------
+#define N_FEATURES {{ n_features }}
+#define N_TARGETS {{ n_targets }}
+#define N_TREES_PER_TARGET {{ n_trees }}
+#define MAX_TREE_DEPTH {{ max_depth }}
+#define MAX_NNODES {{ max_nodes }}
+
+
+{% if precision_type == 'float' %}
+// --------------------------------------------------
+// Floating-point data types
+// --------------------------------------------------
+typedef float feature_t;
+typedef float threshold_t;
+typedef float score_t;
+{% else %}
+// --------------------------------------------------
+// Fixed-point data types
+// --------------------------------------------------
+typedef {{ precision_type }} feature_t;
+typedef {{ precision_type }} threshold_t;
+typedef {{ precision_type }} score_t;
+{% endif %}
+
+
+// --------------------------------------------------
+// AXI types (32-bit float-compatible)
+typedef ap_axiu<32, 0, 0, 0> input_axi_t;
+typedef ap_axiu<32, 0, 0, 0> output_axi_t;
+
+
+
+// --------------------------------------------------
+// Packed structs for data_pack
+// --------------------------------------------------
+struct input_t {
+    feature_t data[N_FEATURES];
+};
+
+struct result_t {
+    score_t data[N_TARGETS];
+};
+
+// --------------------------------------------------
+// Tree model structure
+// --------------------------------------------------
+struct TreeData {
+    ap_uint<3>  feature[MAX_NNODES];
+    threshold_t threshold[MAX_NNODES];
+    score_t     value[MAX_NNODES];
+    ap_uint<8>  left[MAX_NNODES];
+    ap_uint<8>  right[MAX_NNODES];
+    ap_uint<1>  is_leaf[MAX_NNODES];
+    ap_uint<8>  nnodes;
+};
+
+// --------------------------------------------------
+// Function declarations
+// --------------------------------------------------
+void predict_axi(hls::stream<input_axi_t>& in, hls::stream<output_axi_t>& out);
+void predict_array(const input_t &input, result_t &output);
+score_t traverse_tree_array(const feature_t features[N_FEATURES], const TreeData& tree_data);
+
+#endif // RFR_COMMON_H

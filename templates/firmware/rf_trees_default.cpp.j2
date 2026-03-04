@@ -1,0 +1,10 @@
+#include "rf_trees_default.h"
+#include "rf_trees_bram.h"
+
+void load_default_trees_from_rom() {
+{% for target_idx in range(n_targets) %}
+{% for tree_idx in range(n_trees_per_target) %}
+    bram_trees[{{ target_idx * n_trees_per_target + tree_idx }}] = default_target{{ target_idx }}_tree{{ tree_idx }};
+{% endfor %}
+{% endfor %}
+}

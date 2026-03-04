@@ -1,0 +1,339 @@
+#!/usr/bin/env python3
+"""FluidML command line interface."""
+
+from __future__ import annotations
+
+import argparse
+import logging
+import pickle
+import sys
+from pathlib import Path
+from typing import List, Optional
+
+import yaml
+
+from .framework import FluidMLFramework, create_sample_config
+from .logos import get_logo
+
+logger = logging.getLogger(__name__)
+
+
+def _parse_csv_columns(raw: Optional[str]) -> Optional[List[str]]:
+    if not raw:
+        return None
+    values = [item.strip() for item in raw.split(",") if item.strip()]
+    return values or None
+
+
+class FluidMLCLI:
+    def __init__(self):
+        self.parser = self._create_parser()
+
+    def _create_parser(self) -> argparse.ArgumentParser:
+        parent_parser = argparse.ArgumentParser(add_help=False)
+        verbosity_group = parent_parser.add_mutually_exclusive_group()
+        verbosity_group.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
+        verbosity_group.add_argument("--quiet", "-q", action="store_true", help="Suppress output")
+
+        parser = argparse.ArgumentParser(
+            description="FluidML - Generate optimized ML inference code",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            parents=[parent_parser],
+            epilog="""
+Examples:
+
+# Vivado HLS (default)
+fluidml quick-start --data data.csv --features f1,f2 --targets t1 --output myproject
+
+# Vitis HLS
+fluidml quick-start --data data.csv --features f1,f2 --targets t1 --backend vitis_hls --output myproject
+
+# With config file
+fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
+            """,
+        )
+
+        parser.add_argument("--version", action="version", version="FluidML 1.1")
+        subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+        self._add_train_parser(subparsers, parent_parser)
+        self._add_export_parser(subparsers, parent_parser)
+        self._add_quickstart_parser(subparsers, parent_parser)
+        self._add_config_parser(subparsers, parent_parser)
+        self._add_synthesis_parser(subparsers, parent_parser)
+        return parser
+
+    def _add_train_parser(self, subparsers, parent_parser) -> None:
+        train_parser = subparsers.add_parser("train", help="Train a machine learning model", parents=[parent_parser])
+        data_group = train_parser.add_argument_group("Data Options")
+        data_group.add_argument("--data", "-d", required=True, help="Path to dataset file or URL")
+        data_group.add_argument("--features", "-f", help="Comma-separated list of feature columns")
+        data_group.add_argument("--targets", "-t", help="Comma-separated list of target columns")
+        data_group.add_argument("--test-size", type=float, default=0.2, help="Test set size (default: 0.2)")
+
+        model_group = train_parser.add_argument_group("Model Options")
+        model_group.add_argument("--n-estimators", type=int, default=20, help="Number of estimators")
+        model_group.add_argument("--max-depth", type=int, default=6, help="Maximum tree depth")
+
+        train_parser.add_argument("--config", "-c", help="Configuration file (YAML/JSON)")
+        train_parser.add_argument("--output", "-o", default="fluidml_output", help="Output directory")
+        train_parser.add_argument("--save-model", help="Save trained model to file")
+        train_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="HLS synthesis backend")
+
+    def _add_export_parser(self, subparsers, parent_parser) -> None:
+        export_parser = subparsers.add_parser("export", help="Export trained model", parents=[parent_parser])
+        export_parser.add_argument("--model", "-m", required=True, help="Path to trained model file")
+        export_parser.add_argument("--target", choices=["hls"], default="hls", help="Export target format")
+        export_parser.add_argument("--output", "-o", default="fluidml_export", help="Output directory")
+        export_parser.add_argument("--export-format", choices=["default", "legacy"], default="legacy", help="Export format")
+        export_parser.add_argument("--jinja2", action="store_true", help="Use Jinja2 templates")
+        export_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="HLS synthesis backend")
+        export_parser.add_argument("--vitis-flow", choices=["hw", "hw_emu"], default="hw", help="Vitis flow target")
+
+    def _add_quickstart_parser(self, subparsers, parent_parser) -> None:
+        quick_parser = subparsers.add_parser("quick-start", help="Quick start with automatic configuration", parents=[parent_parser])
+        quick_parser.add_argument("--data", "-d", required=True, help="Path to dataset file or URL")
+        quick_parser.add_argument("--output", "-o", default="fluidml_quickstart", help="Output directory")
+        quick_parser.add_argument("--features", "-f", help="Comma-separated list of feature columns")
+        quick_parser.add_argument("--targets", "-t", help="Comma-separated list of target columns")
+        quick_parser.add_argument("--export-format", choices=["default", "legacy"], default="legacy", help="Export format")
+        quick_parser.add_argument("--jinja2", action="store_true", help="Use Jinja2 templates")
+        quick_parser.add_argument("--n-estimators", type=int, default=20, help="Number of estimators")
+        quick_parser.add_argument("--max-depth", type=int, default=6, help="Maximum tree depth")
+        quick_parser.add_argument("--config", "-c", help="Configuration file (YAML/JSON)")
+        quick_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="HLS synthesis backend")
+        quick_parser.add_argument("--vitis-flow", choices=["hw", "hw_emu"], default="hw", help="Vitis flow target")
+        quick_parser.add_argument("--fpga-part", type=str, help="FPGA part number override")
+        quick_parser.add_argument("--clock-period", type=float, help="Clock period in ns")
+
+    def _add_config_parser(self, subparsers, parent_parser) -> None:
+        config_parser = subparsers.add_parser("create-config", help="Create configuration file", parents=[parent_parser])
+        config_parser.add_argument("--template", choices=["default", "energy", "automotive"], default="default")
+        config_parser.add_argument("--output", "-o", default="fluidml_config.yaml", help="Output config file")
+        config_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="Target HLS backend")
+
+    def _add_synthesis_parser(self, subparsers, parent_parser) -> None:
+        synth_parser = subparsers.add_parser("hls-report", help="Print Vivado/Vitis HLS synthesis summary", parents=[parent_parser])
+        synth_parser.add_argument("--project-dir", "-p", default="fluidml_output", help="HLS project directory")
+
+    def run(self, args=None) -> int:
+        args = self.parser.parse_args(args)
+        self._configure_logging(args)
+
+        handlers = {
+            "train": self._handle_train,
+            "export": self._handle_export,
+            "quick-start": self._handle_quickstart,
+            "create-config": self._handle_create_config,
+            "hls-report": self._handle_synthesis_report,
+        }
+
+        if args.command not in handlers:
+            self.parser.print_help()
+            return 1
+
+        try:
+            return handlers[args.command](args)
+        except KeyboardInterrupt:
+            logger.error("Operation interrupted by user")
+            return 1
+        except Exception as exc:
+            logger.error("Command failed: %s", exc)
+            if getattr(args, "verbose", False):
+                logger.debug("Full traceback:", exc_info=True)
+            return 1
+
+    def _configure_logging(self, args) -> None:
+        is_quiet = getattr(args, "quiet", False)
+        is_verbose = getattr(args, "verbose", False)
+        log_level = logging.ERROR if is_quiet else logging.DEBUG if is_verbose else logging.INFO
+        logging.basicConfig(
+            level=log_level,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+            force=True,
+        )
+
+    def _build_framework(self, args) -> FluidMLFramework:
+        if args.config:
+            framework = FluidMLFramework(args.config)
+            logger.info("Using configuration from: %s", args.config)
+            return framework
+
+        framework = FluidMLFramework()
+        framework.config.config["project"]["output_dir"] = args.output
+        framework.config.config["export"]["format"] = getattr(args, "export_format", "legacy")
+        framework.config.config["model"]["n_estimators"] = getattr(args, "n_estimators", framework.config.config["model"]["n_estimators"])
+        framework.config.config["model"]["max_depth"] = getattr(args, "max_depth", framework.config.config["model"]["max_depth"])
+        if hasattr(args, "test_size"):
+            framework.config.config["data"]["test_size"] = args.test_size
+
+        backend = getattr(args, "backend", "vivado_hls")
+        framework.config.set_backend(backend)
+        if backend == "vitis_hls":
+            framework.config.config["hls"]["vitis_flow_target"] = getattr(args, "vitis_flow", "hw")
+            if getattr(args, "fpga_part", None):
+                framework.config.config["export"]["fpga_part"] = args.fpga_part
+                framework.config.config["hls"]["target_device"] = args.fpga_part
+            if getattr(args, "clock_period", None):
+                framework.config.config["export"]["clock_period"] = args.clock_period
+                framework.config.config["hls"]["clock_period"] = f"{args.clock_period}ns"
+        return framework
+
+    def _handle_train(self, args) -> int:
+        logger.info("FluidML Training")
+        logger.info("=" * 40)
+        framework = self._build_framework(args)
+
+        feature_cols = _parse_csv_columns(args.features)
+        target_cols = _parse_csv_columns(args.targets)
+        logger.info("Loading data from: %s", args.data)
+        framework.load_data(args.data, feature_cols, target_cols)
+
+        logger.info("Training model...")
+        metrics = framework.train()
+        logger.info("\nTraining Results:")
+        for key, value in metrics.items():
+            logger.info("%s: %.4f", key, value) if isinstance(value, float) else logger.info("%s: %s", key, value)
+
+        if args.save_model:
+            with Path(args.save_model).open("wb") as file:
+                pickle.dump(framework.model, file)
+            logger.info("\nModel saved to: %s", args.save_model)
+
+        framework.generate_report()
+        logger.info("\nTraining completed! Check results in: %s", framework.config.config["project"]["output_dir"])
+        return 0
+
+    def _handle_export(self, args) -> int:
+        logger.info("FluidML Export")
+        logger.info("=" * 40)
+        model_path = Path(args.model)
+        if not model_path.exists():
+            logger.error("Error: Model file not found: %s", args.model)
+            return 1
+
+        logger.info("Loading model from: %s", args.model)
+        with model_path.open("rb") as file:
+            model = pickle.load(file)
+
+        framework = self._build_framework(args)
+        framework.model = model
+        logger.info("Exporting to HLS (%s)...", framework.config.backend.backend)
+        framework.export_to_hls_j2(args.output)
+
+        logger.info("\nHLS Export completed!")
+        logger.info("Generated files in: %s", args.output)
+        if framework.config.backend.backend == "vitis_hls":
+            logger.info("Run: cd %s && vitis_hls -f *.tcl", args.output)
+        else:
+            logger.info("Run: cd %s && vivado_hls -f *.tcl", args.output)
+        return 0
+
+    def _handle_quickstart(self, args) -> int:
+        logger.info("FluidML Quick Start")
+        logger.info("=" * 40)
+        framework = self._build_framework(args)
+
+        logger.info("Using HLS backend: %s", framework.config.backend.backend)
+        logger.info("Loading data from: %s", args.data)
+        feature_cols = _parse_csv_columns(args.features)
+        target_cols = _parse_csv_columns(args.targets)
+        framework.load_data(args.data, feature_cols, target_cols)
+
+        logger.info("Training model with automatic configuration...")
+        metrics = framework.train()
+
+        logger.info("\nQuick Start Results:")
+        for key, value in metrics.items():
+            logger.info("%s: %.4f", key, value) if isinstance(value, float) else logger.info("%s: %s", key, value)
+
+        backend = framework.config.backend.backend
+        logger.info("\nExporting to %s...", backend)
+        framework.export_to_hls_j2()
+        framework.generate_report()
+
+        logger.info("\nQuick start completed!")
+        logger.info("Check results in: %s", framework.config.config["project"]["output_dir"])
+        logger.info("Backend: %s", backend)
+        if backend == "vitis_hls":
+            logger.info("\nTo run Vitis HLS synthesis:")
+            logger.info("   cd %s", framework.config.config["project"]["output_dir"])
+            logger.info("   vitis_hls -f %s.tcl", framework.config.config["project"]["name"])
+        else:
+            logger.info("\nTo run Vivado HLS synthesis:")
+            logger.info("   cd %s", framework.config.config["project"]["output_dir"])
+            logger.info("   vivado_hls -f %s.tcl", framework.config.config["project"]["name"])
+            logger.info("\nAfter HLS export, generate bitstream:")
+            logger.info(
+                "   cd %s && vivado -mode batch -source vivado_block_design.tcl",
+                framework.config.config["project"]["output_dir"],
+            )
+        return 0
+
+    def _handle_create_config(self, args) -> int:
+        logger.info("FluidML Create Configuration")
+        create_sample_config(args.output)
+
+        if args.backend != "vitis_hls":
+            logger.info("Configuration template (Vivado HLS) saved to: %s", args.output)
+            return 0
+
+        with Path(args.output).open("r", encoding="utf-8") as file:
+            config = yaml.safe_load(file) or {}
+
+        config.setdefault("hls", {})
+        config.setdefault("export", {})
+        config["hls"]["backend"] = "vitis_hls"
+        config["hls"]["vitis_flow_target"] = "hw"
+        config["export"]["fpga_part"] = "xcvu9p-flga2104-2-i"
+        config["export"]["clock_period"] = 3.33
+
+        with Path(args.output).open("w", encoding="utf-8") as file:
+            yaml.dump(config, file, default_flow_style=False, indent=2)
+        logger.info("Configuration template (Vitis HLS) saved to: %s", args.output)
+        return 0
+
+    def _handle_synthesis_report(self, args) -> int:
+        project_dir = Path(args.project_dir)
+        report_file = project_dir / "solution1" / "syn" / "report" / "predict_array_csynth.rpt"
+        if not report_file.exists():
+            logger.error("Report file not found: %s", report_file)
+            return 1
+
+        print(f"\nHLS Synthesis Report (summary): {report_file}\n{'=' * 60}")
+        print_lines = []
+        record = False
+        with report_file.open("r", encoding="utf-8", errors="ignore") as file:
+            for line in file:
+                if "== Performance Estimates" in line:
+                    record = True
+                if record:
+                    print_lines.append(line)
+                if "== Utilization Estimates" in line:
+                    for _ in range(15):
+                        next_line = file.readline()
+                        if not next_line:
+                            break
+                        print_lines.append(next_line)
+                    break
+        print("".join(print_lines))
+        print(f"{'=' * 60}\nEnd of summary\n")
+        return 0
+
+
+def main(argv=None) -> int:
+    print(get_logo("bold"))
+    cli = FluidMLCLI()
+    try:
+        return cli.run(argv)
+    except KeyboardInterrupt:
+        print("\nInterrupted by user")
+        return 1
+    except Exception as exc:
+        print(f"Unexpected error: {exc}")
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

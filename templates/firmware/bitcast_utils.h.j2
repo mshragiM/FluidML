@@ -1,0 +1,34 @@
+#ifndef BITCAST_UTILS_H
+#define BITCAST_UTILS_H
+
+#include <ap_fixed.h>
+#include "rfr_common.h"
+
+{% if precision == 'float' %}
+union float_bits {
+    float f;
+    ap_uint<32> i;
+};
+
+inline ap_uint<32> fixed_to_bits(score_t val) {
+    return *((ap_uint<32>*)&val);
+}
+
+inline score_t bits_to_fixed(ap_uint<32> val) {
+    return *((score_t*)&val);
+}
+{% else %}
+inline ap_uint<32> fixed_to_bits(score_t val) {
+    ap_uint<32> result = 0;
+    result.range(15, 0) = val & 0xFFFF;
+    if (val & 0x8000) result.range(31, 16) = 0xFFFF;
+    return result;
+}
+
+inline score_t bits_to_fixed(ap_uint<32> val) {
+    score_t result = (val.range(15, 0) & 0xFFFF) | (val[15] ? 0xFFFF0000 : 0);
+    return result;
+}
+{% endif %}
+
+#endif

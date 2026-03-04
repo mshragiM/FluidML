@@ -1,0 +1,14 @@
+#ifndef SCALER_CONSTANTS_H_
+#define SCALER_CONSTANTS_H_
+
+#include <ap_fixed.h>
+
+#define N_TARGETS {{ n_targets }}
+
+{% if scaler_y %}
+// Output scaler constants  
+static const float y_min[N_TARGETS] = { {% for val in scaler_y_data_min %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} };
+static const float y_range[N_TARGETS] = { {% for val in scaler_y_data_range %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} };
+{% endif %}
+
+#endif // SCALER_CONSTANTS_H_

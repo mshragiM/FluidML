@@ -1,0 +1,59 @@
+#include "rfr_common.h"
+#include "rf_trees_array.h"
+#include "bitcast_utils.h"
+#include <hls_stream.h>
+
+// ========================== Optimized Traverse and Predict ==========================
+score_t traverse_tree_array(const feature_t features[N_FEATURES], const TreeData& tree_data) {
+#pragma HLS INLINE
+#pragma HLS ARRAY_PARTITION variable=features complete dim=1
+
+#pragma HLS ARRAY_PARTITION variable=tree_data.feature cyclic factor=2 dim=1
+#pragma HLS ARRAY_PARTITION variable=tree_data.threshold cyclic factor=2 dim=1
+#pragma HLS ARRAY_PARTITION variable=tree_data.left cyclic factor=2 dim=1
+#pragma HLS ARRAY_PARTITION variable=tree_data.right cyclic factor=2 dim=1
+#pragma HLS ARRAY_PARTITION variable=tree_data.is_leaf cyclic factor=2 dim=1
+#pragma HLS ARRAY_PARTITION variable=tree_data.value cyclic factor=2 dim=1
+
+    int current_node = 0;
+
+    // First level outside loop for better optimization
+    if (tree_data.is_leaf[current_node]) return tree_data.value[current_node];
+    ap_uint<3> feature_idx = tree_data.feature[current_node];
+    threshold_t threshold = tree_data.threshold[current_node];
+    current_node = (features[feature_idx] <= threshold) ? tree_data.left[current_node] : tree_data.right[current_node];
+
+    // Optimized loop with better pipeline
+    for (int i = 1; i < MAX_TREE_DEPTH; i++) {
+#pragma HLS PIPELINE II=1
+#pragma HLS LOOP_TRIPCOUNT min=2 max=7 avg=4
+        if (tree_data.is_leaf[current_node]) return tree_data.value[current_node];
+        feature_idx = tree_data.feature[current_node];
+        threshold = tree_data.threshold[current_node];
+        current_node = (features[feature_idx] <= threshold) ? tree_data.left[current_node] : tree_data.right[current_node];
+    }
+    return tree_data.value[current_node];
+}
+
+// ========================== Optimized Prediction Function ==========================
+void predict_array(const input_t &input, result_t &output) {
+#pragma HLS INLINE off
+#pragma HLS ARRAY_PARTITION variable=input.data complete dim=1
+#pragma HLS ARRAY_PARTITION variable=output.data complete dim=1
+
+    score_t {% for i in range(n_targets) %}sum{{ i }} = 0{% if not loop.last %}, {% endif %}{% endfor %}; // PROPERLY initialized! // Single declaration
+
+    // Main loop
+    for (int i = 0; i < N_TREES_PER_TARGET; ++i) {
+    #pragma HLS PIPELINE II=1
+        {% for i in range(n_targets) %}score_t partial{{ i }} = traverse_tree_array(input.data, target_trees[{{ i }}][i]);
+        {% endfor %}
+        {% for i in range(n_targets) %}#pragma HLS RESOURCE variable=sum{{ i }} core=AddSub_DSP latency=1
+        sum{{ i }} += partial{{ i }};
+        {% endfor %}
+    }
+
+    // Final division
+    {% for i in range(n_targets) %}output.data[{{ i }}] = sum{{ i }} / N_TREES_PER_TARGET;
+    {% endfor %}
+}

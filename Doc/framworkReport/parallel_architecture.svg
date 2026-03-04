@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1405.2045 997.52173"
+   version="1.1"
+   id="svg79"
+   sodipodi:docname="parallel_architecture.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   width="1405.2045"
+   height="997.52173"
+   inkscape:export-filename="framworkReport\parallel_architecture.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview79"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="0.57063517"
+     inkscape:cx="870.08307"
+     inkscape:cy="631.75216"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg79" />
+  <rect
+     style="fill:#ffffff;fill-opacity:1;stroke-width:2.163;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1.87109, 1.87109"
+     id="rect79"
+     width="1405.2045"
+     height="997.52173"
+     x="0"
+     y="0"
+     rx="8" />
+  <!-- Title -->
+  <text
+     x="741.89612"
+     y="38.19009"
+     font-size="31.0917px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text1"
+     style="stroke-width:1.41326">Multi-Target Random Forest Parallel Evaluation Architecture</text>
+  <!-- Input Stage -->
+  <g
+     id="input_stage"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="50"
+       y="80"
+       width="200"
+       height="100"
+       fill="#3498db"
+       stroke="#2c3e50"
+       stroke-width="3"
+       rx="10"
+       id="rect1" />
+    <text
+       x="150"
+       y="110"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text2">Input Features</text>
+    <text
+       x="150"
+       y="135"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text3">X[N_FEATURES]</text>
+    <text
+       x="150"
+       y="155"
+       font-size="11px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text4">AXI Stream + DMA</text>
+    <text
+       x="150"
+       y="170"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ecf0f1"
+       id="text5">{x₀, x₁, x₂, x₃, x₄}</text>
+  </g>
+  <!-- Scaler Stage -->
+  <path
+     d="m 248.76084,126.28253 h 70"
+     stroke="#2c3e50"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path5" />
+  <g
+     id="scaler"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="320"
+       y="90"
+       width="180"
+       height="80"
+       fill="#9b59b6"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="8"
+       id="rect5" />
+    <text
+       x="410"
+       y="115"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text6">MinMax Scaler</text>
+    <text
+       x="410"
+       y="135"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text7">x' = (x - min) / range</text>
+    <text
+       x="410"
+       y="155"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ecf0f1"
+       id="text8">#pragma HLS INLINE</text>
+  </g>
+  <!-- Broadcast to Targets -->
+  <path
+     d="m 498.76084,126.28253 h 70"
+     stroke="#2c3e50"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path8" />
+  <text
+     x="510.21686"
+     y="108.8476"
+     font-size="10px"
+     fill="#7f8c8d"
+     id="text9">broadcast</text>
+  <!-- Target 0 Processing -->
+  <g
+     id="target0"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="570"
+       y="80"
+       width="320"
+       height="180"
+       fill="#e8f5e9"
+       stroke="#27ae60"
+       stroke-width="3"
+       rx="10"
+       id="rect9" />
+    <text
+       x="730"
+       y="105"
+       font-size="15px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#1b5e20"
+       id="text10">Target 0: Elec_Cons</text>
+    <!-- Tree Processing Units -->
+    <rect
+       x="590"
+       y="120"
+       width="80"
+       height="60"
+       fill="#27ae60"
+       stroke="#1b5e20"
+       stroke-width="2"
+       rx="5"
+       id="rect10" />
+    <text
+       x="630"
+       y="140"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text11">Tree 0</text>
+    <text
+       x="630"
+       y="155"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text12">traverse()</text>
+    <text
+       x="630"
+       y="170"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text13">→ v₀</text>
+    <rect
+       x="680"
+       y="120"
+       width="80"
+       height="60"
+       fill="#27ae60"
+       stroke="#1b5e20"
+       stroke-width="2"
+       rx="5"
+       id="rect13" />
+    <text
+       x="720"
+       y="140"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text14">Tree 1</text>
+    <text
+       x="720"
+       y="155"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text15">traverse()</text>
+    <text
+       x="720"
+       y="170"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text16">→ v₁</text>
+    <rect
+       x="770"
+       y="120"
+       width="80"
+       height="60"
+       fill="#27ae60"
+       stroke="#1b5e20"
+       stroke-width="2"
+       rx="5"
+       id="rect16" />
+    <text
+       x="810"
+       y="140"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text17">...</text>
+    <text
+       x="810"
+       y="155"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text18">Tree N-1</text>
+    <text
+       x="810"
+       y="170"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text19">→ vₙ</text>
+    <!-- Accumulator -->
+    <rect
+       x="590"
+       y="195"
+       width="260"
+       height="50"
+       fill="#f39c12"
+       stroke="#d68910"
+       stroke-width="2"
+       rx="5"
+       id="rect19" />
+    <text
+       x="720"
+       y="215"
+       font-size="12px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text20"
+       style="fill:#020202;fill-opacity:1">Accumulator: Σ(v₀...vₙ) / N</text>
+    <text
+       x="720"
+       y="232"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text21"
+       style="fill:#000000;fill-opacity:1">#pragma HLS PIPELINE II=1</text>
+  </g>
+  <!-- Target 1 Processing -->
+  <g
+     id="target1"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="570"
+       y="280"
+       width="320"
+       height="180"
+       fill="#fff3e0"
+       stroke="#f57c00"
+       stroke-width="3"
+       rx="10"
+       id="rect21" />
+    <text
+       x="730"
+       y="305"
+       font-size="15px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#e65100"
+       id="text22">Target 1: Therm_Eng_Cons</text>
+    <rect
+       x="590"
+       y="320"
+       width="80"
+       height="60"
+       fill="#ff9800"
+       stroke="#e65100"
+       stroke-width="2"
+       rx="5"
+       id="rect22" />
+    <text
+       x="630"
+       y="340"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text23"
+       style="fill:#000000;fill-opacity:1">Tree 0</text>
+    <text
+       x="630"
+       y="355"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text24"
+       style="fill:#000000;fill-opacity:1">traverse()</text>
+    <text
+       x="630"
+       y="370"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text25"
+       style="fill:#000000;fill-opacity:1">→ v₀</text>
+    <rect
+       x="680"
+       y="320"
+       width="80"
+       height="60"
+       fill="#ff9800"
+       stroke="#e65100"
+       stroke-width="2"
+       rx="5"
+       id="rect25" />
+    <text
+       x="720"
+       y="340"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text26"
+       style="fill:#000000;fill-opacity:1">Tree 1</text>
+    <text
+       x="720"
+       y="355"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text27"
+       style="fill:#000000;fill-opacity:1">traverse()</text>
+    <text
+       x="720"
+       y="370"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text28"
+       style="fill:#000000;fill-opacity:1">→ v₁</text>
+    <rect
+       x="770"
+       y="320"
+       width="80"
+       height="60"
+       fill="#ff9800"
+       stroke="#e65100"
+       stroke-width="2"
+       rx="5"
+       id="rect28" />
+    <text
+       x="810"
+       y="340"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text29"
+       style="fill:#000000;fill-opacity:1">...</text>
+    <text
+       x="810"
+       y="355"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text30"
+       style="fill:#000000;fill-opacity:1">Tree N-1</text>
+    <text
+       x="810"
+       y="370"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text31"
+       style="fill:#000000;fill-opacity:1">→ vₙ</text>
+    <rect
+       x="590"
+       y="395"
+       width="260"
+       height="50"
+       fill="#f39c12"
+       stroke="#d68910"
+       stroke-width="2"
+       rx="5"
+       id="rect31" />
+    <text
+       x="720"
+       y="415"
+       font-size="12px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text32"
+       style="fill:#000000;fill-opacity:1">Accumulator: Σ(v₀...vₙ) / N</text>
+    <text
+       x="720"
+       y="432"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text33"
+       style="fill:#000000;fill-opacity:1">#pragma HLS PIPELINE II=1</text>
+  </g>
+  <!-- Target 2 Processing -->
+  <g
+     id="target2"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="570"
+       y="480"
+       width="320"
+       height="180"
+       fill="#f3e5f5"
+       stroke="#7b1fa2"
+       stroke-width="3"
+       rx="10"
+       id="rect33" />
+    <text
+       x="730"
+       y="505"
+       font-size="15px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#4a148c"
+       id="text34">Target 2: PMV</text>
+    <rect
+       x="590"
+       y="520"
+       width="80"
+       height="60"
+       fill="#9c27b0"
+       stroke="#4a148c"
+       stroke-width="2"
+       rx="5"
+       id="rect34" />
+    <text
+       x="630"
+       y="540"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text35">Tree 0</text>
+    <text
+       x="630"
+       y="555"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text36">traverse()</text>
+    <text
+       x="630"
+       y="570"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text37">→ v₀</text>
+    <rect
+       x="680"
+       y="520"
+       width="80"
+       height="60"
+       fill="#9c27b0"
+       stroke="#4a148c"
+       stroke-width="2"
+       rx="5"
+       id="rect37" />
+    <text
+       x="720"
+       y="540"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text38">Tree 1</text>
+    <text
+       x="720"
+       y="555"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text39">traverse()</text>
+    <text
+       x="720"
+       y="570"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text40">→ v₁</text>
+    <rect
+       x="770"
+       y="520"
+       width="80"
+       height="60"
+       fill="#9c27b0"
+       stroke="#4a148c"
+       stroke-width="2"
+       rx="5"
+       id="rect40" />
+    <text
+       x="810"
+       y="540"
+       font-size="11px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text41">...</text>
+    <text
+       x="810"
+       y="555"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text42">Tree N-1</text>
+    <text
+       x="810"
+       y="570"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text43">→ vₙ</text>
+    <rect
+       x="590"
+       y="595"
+       width="260"
+       height="50"
+       fill="#f39c12"
+       stroke="#d68910"
+       stroke-width="2"
+       rx="5"
+       id="rect43" />
+    <text
+       x="720"
+       y="615"
+       font-size="12px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text44"
+       style="fill:#000000;fill-opacity:1">Accumulator: Σ(v₀...vₙ) / N</text>
+    <text
+       x="720"
+       y="632"
+       font-size="9px"
+       text-anchor="middle"
+       fill="white"
+       id="text45"
+       style="fill:#000000;fill-opacity:1">#pragma HLS PIPELINE II=1</text>
+  </g>
+  <!-- Inverse Scaler -->
+  <path
+     d="m 892.94479,249.78262 57.22306,40.31775"
+     stroke="#2c3e50"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path45" />
+  <path
+     d="m 893.81722,351.11644 66.7529,0.15964"
+     stroke="#2c3e50"
+     stroke-width="2.79346"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path46" />
+  <path
+     d="m 887.52168,491.12764 70,-80"
+     stroke="#2c3e50"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path47" />
+  <g
+     id="inverse_scaler"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="960"
+       y="300"
+       width="180"
+       height="100"
+       fill="#e74c3c"
+       stroke="#2c3e50"
+       stroke-width="2"
+       rx="8"
+       id="rect47" />
+    <text
+       x="1050"
+       y="325"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="white"
+       id="text47"
+       style="fill:#000000;fill-opacity:1">Inverse Scaler</text>
+    <text
+       x="1050"
+       y="345"
+       font-size="10px"
+       text-anchor="middle"
+       fill="white"
+       id="text48"
+       style="fill:#000000;fill-opacity:1">y = y' × range + min</text>
+    <text
+       x="1050"
+       y="365"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ecf0f1"
+       id="text49"
+       style="fill:#000000;fill-opacity:1">Restore original scale</text>
+    <text
+       x="1050"
+       y="385"
+       font-size="9px"
+       text-anchor="middle"
+       fill="#ecf0f1"
+       id="text50"
+       style="fill:#000000;fill-opacity:1">#pragma HLS INLINE</text>
+  </g>
+  <!-- Output Stage -->
+  <path
+     d="m 1138.7608,346.28253 h 70"
+     stroke="#2c3e50"
+     stroke-width="3"
+     fill="none"
+     marker-end="url(#arrowhead)"
+     id="path50" />
+  <g
+     id="output_stage"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="1210"
+       y="300"
+       width="180"
+       height="100"
+       fill="#16a085"
+       stroke="#2c3e50"
+       stroke-width="3"
+       rx="10"
+       id="rect50" />
+    <text
+       x="1300"
+       y="330"
+       font-size="16px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text51">Output Results</text>
+    <text
+       x="1300"
+       y="355"
+       font-size="12px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text52">Y[N_TARGETS]</text>
+    <text
+       x="1300"
+       y="375"
+       font-size="11px"
+       text-anchor="middle"
+       fill="#ffffff"
+       id="text53">AXI Stream + DMA</text>
+    <text
+       x="1300"
+       y="390"
+       font-size="10px"
+       text-anchor="middle"
+       fill="#ecf0f1"
+       id="text54">{ŷ₀, ŷ₁, ŷ₂}</text>
+  </g>
+  <!-- Resource Allocation Box -->
+  <rect
+     x="48.760841"
+     y="696.28253"
+     width="1340"
+     height="250"
+     fill="#ecf0f1"
+     stroke="#2c3e50"
+     stroke-width="3"
+     rx="10"
+     id="rect54" />
+  <text
+     x="718.76086"
+     y="731.28253"
+     font-size="18px"
+     font-weight="bold"
+     text-anchor="middle"
+     fill="#2c3e50"
+     id="text55">Resource Utilization Strategy</text>
+  <!-- BRAM Usage -->
+  <g
+     id="bram_usage"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="80"
+       y="760"
+       width="300"
+       height="160"
+       fill="#ffffff"
+       stroke="#3498db"
+       stroke-width="2"
+       rx="8"
+       id="rect55" />
+    <text
+       x="230"
+       y="785"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#3498db"
+       id="text56">📦 BRAM (45%)</text>
+    <text
+       x="100"
+       y="810"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text57">• Tree arrays (5 per tree)</text>
+    <text
+       x="100"
+       y="830"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text58">• 3 targets × 20 trees = 60 forests</text>
+    <text
+       x="100"
+       y="850"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text59">• 128 nodes × 16-bit = 2KB/array</text>
+    <text
+       x="100"
+       y="870"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text60">• Total: 126 BRAM_18K blocks</text>
+    <text
+       x="230"
+       y="895"
+       font-size="10px"
+       font-style="italic"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text61">Contiguous storage for burst access</text>
+  </g>
+  <!-- LUT Usage -->
+  <g
+     id="lut_usage"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="410"
+       y="760"
+       width="300"
+       height="160"
+       fill="#ffffff"
+       stroke="#27ae60"
+       stroke-width="2"
+       rx="8"
+       id="rect61" />
+    <text
+       x="560"
+       y="785"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#27ae60"
+       id="text62">🔧 LUT (6%)</text>
+    <text
+       x="430"
+       y="810"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text63">• Comparison logic (features &lt; thresh)</text>
+    <text
+       x="430"
+       y="830"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text64">• Index multiplexing (left/right)</text>
+    <text
+       x="430"
+       y="850"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text65">• Control FSMs (loop counters)</text>
+    <text
+       x="430"
+       y="870"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text66">• Total: 3,594 LUTs (53,200 avail)</text>
+    <text
+       x="560"
+       y="895"
+       font-size="10px"
+       font-style="italic"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text67">Minimized via pipeline optimization</text>
+  </g>
+  <!-- DSP Usage -->
+  <g
+     id="dsp_usage"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="740"
+       y="760"
+       width="300"
+       height="160"
+       fill="#ffffff"
+       stroke="#e74c3c"
+       stroke-width="2"
+       rx="8"
+       id="rect67" />
+    <text
+       x="890"
+       y="785"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#e74c3c"
+       id="text68">⚡ DSP48E (2%)</text>
+    <text
+       x="760"
+       y="810"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text69">• Accumulation (Σ tree values)</text>
+    <text
+       x="760"
+       y="830"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text70">• Division by N_ESTIMATORS</text>
+    <text
+       x="760"
+       y="850"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text71">• Scaler multiplication/addition</text>
+    <text
+       x="760"
+       y="870"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text72">• Total: 6 DSPs (220 available)</text>
+    <text
+       x="890"
+       y="895"
+       font-size="10px"
+       font-style="italic"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text73">Fixed-point reduces DSP requirements</text>
+  </g>
+  <!-- FF Usage -->
+  <g
+     id="ff_usage"
+     transform="translate(-1.2391573,-3.7174721)">
+    <rect
+       x="1070"
+       y="760"
+       width="300"
+       height="160"
+       fill="#ffffff"
+       stroke="#9b59b6"
+       stroke-width="2"
+       rx="8"
+       id="rect73" />
+    <text
+       x="1220"
+       y="785"
+       font-size="14px"
+       font-weight="bold"
+       text-anchor="middle"
+       fill="#9b59b6"
+       id="text74">📊 FF (4%)</text>
+    <text
+       x="1090"
+       y="810"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text75">• Pipeline registers (II=1)</text>
+    <text
+       x="1090"
+       y="830"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text76">• Stream interface buffers</text>
+    <text
+       x="1090"
+       y="850"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text77">• State machine registers</text>
+    <text
+       x="1090"
+       y="870"
+       font-size="11px"
+       fill="#2c3e50"
+       id="text78">• Total: 5,226 FFs (106,400 avail)</text>
+    <text
+       x="1220"
+       y="895"
+       font-size="10px"
+       font-style="italic"
+       text-anchor="middle"
+       fill="#7f8c8d"
+       id="text79">Low due to memory-bound architecture</text>
+  </g>
+  <!-- Arrow marker -->
+  <defs
+     id="defs79">
+    <marker
+       id="arrowhead"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="3"
+       orient="auto">
+      <polygon
+         points="10,3 0,6 0,0 "
+         fill="#2c3e50"
+         id="polygon79" />
+    </marker>
+  </defs>
+</svg>

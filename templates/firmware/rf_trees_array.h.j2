@@ -1,0 +1,38 @@
+#ifndef RF_TREES_ARRAY_H_
+#define RF_TREES_ARRAY_H_
+
+#include "rfr_common.h"
+#include "ap_fixed.h"
+#include "ap_int.h"
+
+{% for target_idx in range(n_targets) %}
+{% for tree_idx in range(n_trees_per_target) %}
+{% set tree = tree_data[target_idx][tree_idx] %}
+static const TreeData target{{ target_idx }}_tree{{ tree_idx }} = {
+    // Feature indices
+    { {% for val in tree.features %}{{ val }}{% if not loop.last %}, {% endif %}{% endfor %} },
+    
+    // Threshold values
+    { {% for val in tree.thresholds %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} },
+    
+    // Leaf values/scores
+    { {% for val in tree.node_values %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} },
+    // Left child indices
+    { {% for val in tree.left_children %}{{ val }}{% if not loop.last %}, {% endif %}{% endfor %} },
+    
+    // Right child indices
+    { {% for val in tree.right_children %}{{ val }}{% if not loop.last %}, {% endif %}{% endfor %} },
+    
+    // Is leaf flags (1 for leaf nodes, 0 for internal nodes)
+    { {% for val in tree.is_leaf %}{{ val }}{% if not loop.last %}, {% endif %}{% endfor %} },
+    
+    // Total nodes
+    {{ tree.n_nodes }}
+};
+{% endfor %}
+{% endfor %}
+
+// Declare target_trees
+extern const TreeData target_trees[{{ n_targets }}][{{ n_trees_per_target }}];
+
+#endif // RF_TREES_ARRAY_H_

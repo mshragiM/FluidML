@@ -1,0 +1,140 @@
+#include <iostream>
+#include <chrono>
+#include <cmath>
+#include <limits>
+#include <fstream>
+#include "rfr_common.h"
+#include "rf_trees_array.h"
+#include "X_test.h"
+#include "scaler_constants.h"
+#include <hls_stream.h>
+
+extern void predict_axi(hls::stream<input_axi_t>& in, hls::stream<output_axi_t>& out);
+
+inline float unscale(float val, int target_idx) {
+    return val * y_range[target_idx] + y_min[target_idx];
+}
+
+int main(int argc, char* argv[]) {
+    int n_samples = X_TEST_SAMPLES;
+    if (argc > 1) {
+        n_samples = std::atoi(argv[1]);
+    }
+
+    const char* target_names[] = { {% for name in target_names %}"{{ name }}"{% if not loop.last %}, {% endif %}{% endfor %} };
+    const float tolerance = 1.0;
+
+    const int x_test_rows = X_TEST_SAMPLES;
+    if (n_samples > x_test_rows) {
+        std::cerr << "ERROR: n_samples (" << n_samples << ") exceeds X_test rows (" << x_test_rows << ")\n";
+        return 1;
+    }
+
+    std::cout << "=== Running AXI-Stream Prediction and Timing Benchmark ===\n";
+
+    hls::stream<input_axi_t> in_stream;
+    hls::stream<output_axi_t> out_stream;
+
+    for (int s = 0; s < n_samples; ++s) {
+        for (int f = 0; f < N_FEATURES; ++f) {
+            input_axi_t pkt;
+            pkt.data = 0;
+            pkt.data.range(15, 0) = X_test[s][f].range(15, 0);
+            pkt.keep = 0xF;
+            pkt.strb = 0xF;
+            pkt.last = (f == N_FEATURES - 1 && s == n_samples - 1) ? 1 : 0;
+            in_stream.write(pkt);
+        }
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (int s = 0; s < n_samples; ++s) {
+        predict_axi(in_stream, out_stream);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    double duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1e6;
+
+    std::cout << "Total Inference Time: " << duration << " seconds\n";
+    std::cout << "Throughput: " << (n_samples / duration) << " inferences/second\n";
+
+    std::ofstream csv_out("Y_hls_pred.csv");
+    if (!csv_out.is_open()) {
+        std::cerr << "ERROR: Cannot create/open Y_hls_pred.csv for writing.\n";
+        return 1;
+    }
+    csv_out << "{{ csv_header }}\n";
+    bool error_found = false;
+
+    float min_val[N_TARGETS], max_val[N_TARGETS];
+    for (int i = 0; i < N_TARGETS; ++i) {
+        min_val[i] = std::numeric_limits<float>::max();
+        max_val[i] = std::numeric_limits<float>::lowest();
+    }
+
+    for (int s = 0; s < n_samples; ++s) {
+        input_t packed_input;
+        for (int f = 0; f < N_FEATURES; ++f) {
+            packed_input.data[f] = X_test[s][f];
+        }
+        result_t ref_output;
+        predict_array(packed_input, ref_output);
+
+        for (int t = 0; t < N_TARGETS; ++t) {
+            output_axi_t pkt;
+            out_stream.read(pkt);
+
+            ap_int<18> raw18 = pkt.data.range(15, 0);
+            score_t axi_val_fp;
+            axi_val_fp.range(15, 0) = raw18;
+            float axi_val = unscale(static_cast<float>(axi_val_fp), t);
+            float ref_val = unscale(static_cast<float>(ref_output.data[t]), t);
+
+            if (t > 0) csv_out << ",";
+            csv_out << axi_val;
+            if (t == N_TARGETS - 1) csv_out << "\n";
+
+            if (axi_val < min_val[t]) min_val[t] = axi_val;
+            if (axi_val > max_val[t]) max_val[t] = axi_val;
+
+            if (std::abs(axi_val - ref_val) > tolerance) {
+                std::cout << "ERROR: Mismatch at sample " << s + 1 << ", target " << target_names[t] << ":\n";
+                std::cout << "  predict_axi: " << axi_val << ", ref: " << ref_val << "\n";
+                error_found = true;
+            }
+
+            if (s < 3 || s >= n_samples - 3) {
+                if (t == 0) std::cout << "Sample " << s + 1 << ":\n";
+                std::cout << "  " << target_names[t] << ": predict_axi=" << axi_val
+                        << ", predict_array=" << ref_val;
+                if (t == N_TARGETS - 1) {
+                    std::cout << (pkt.last ? " (TLAST)" : " (No TLAST)");
+                }
+                std::cout << std::endl;
+            }
+        }
+    }
+
+    csv_out.close();
+    std::ifstream check_csv("Y_hls_pred.csv");
+    if (!check_csv.good()) {
+        std::cerr << "ERROR: Y_hls_pred.csv not created or empty after writing.\n";
+        return 1;
+    }
+
+    std::cout << "\n=== HLS Prediction Value Ranges ===\n";
+    for (int i = 0; i < N_TARGETS; ++i) {
+        std::cout << "Target " << target_names[i] << " range: "
+                << min_val[i] << " to " << max_val[i] << std::endl;
+    }
+
+    if (error_found) {
+        std::cerr << "ERROR: Simulation failed due to prediction mismatches.\n";
+        return 1;
+    } else {
+        std::cout << "All predictions match within tolerance.\n";
+    }
+
+    return 0;
+}
