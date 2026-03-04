@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fluidml"
+version = "1.1.0"
+description = "Train Random Forest models and export HLS-ready FPGA inference code for Vivado/Vitis."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Mogammed Mshragi" }]
+keywords = ["machine-learning", "fpga", "hls", "vivado", "vitis", "random-forest"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Code Generators",
+]
+dependencies = [
+  "numpy>=1.23",
+  "pandas>=1.5",
+  "scikit-learn>=1.2",
+  "Jinja2>=3.1",
+  "PyYAML>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/mshragiM/FluidML"
+Repository = "https://github.com/mshragiM/FluidML"
+Issues = "https://github.com/mshragiM/FluidML/issues"
+
+[project.scripts]
+fluidml = "fluidml.cli:main"
+rf = "fluidml.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+py-modules = ["rf_framework", "rf_cli", "logos_cli", "fluidml_cli"]
+
+[tool.setuptools.packages.find]
+include = ["fluidml*"]
