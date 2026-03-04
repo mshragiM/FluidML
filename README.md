@@ -61,7 +61,7 @@ Install quickly:
 pip install numpy pandas scikit-learn jinja2 pyyaml
 ```
 
-## Quick Start (Your Energy Dataset)
+## Quick Start (Ex. Energy Dataset)
 
 From repository root:
 
@@ -160,24 +160,7 @@ fw.generate_report()
 print(metrics)
 ```
 
-## Backward Compatibility
 
-Legacy wrappers are still available:
-
-- `python rf_cli.py ...`
-- `from rf_framework import ...`
-
-New projects should use `fluidml` modules directly.
-
-## Publication Notes (Recommended for GitHub)
-
-Before public release, add:
-
-- `LICENSE` file (for example, MIT)
-- `requirements.txt` or `pyproject.toml`
-- unit tests (CLI smoke tests + data/model/export tests)
-- CI workflow (lint + tests)
-- tagged release (`v1.0.0`)
 
 ## Author
 
