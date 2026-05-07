@@ -91,7 +91,7 @@ class FluidMLFramework:
 
         with (output_dir / "fluidml_model.pkl").open("wb") as file:
             pkl.dump(self.model, file)
-        logger.info("✅ sklearn model saved to: %s", output_dir / "fluidml_model.pkl")
+        logger.info("sklearn model saved to: %s", output_dir / "fluidml_model.pkl")
 
         if self.data_manager.scaler_x:
             with (output_dir / "scaler_x.pkl").open("wb") as file:
@@ -203,7 +203,7 @@ puts "SUCCESS: Build complete!"
 
         tcl_path = output_dir / "vivado_block_design.tcl"
         tcl_path.write_text(tcl_content, encoding="utf-8")
-        logger.info("✅ Vivado block design TCL generated: %s", tcl_path)
+        logger.info("Vivado block design TCL generated: %s", tcl_path)
         return str(tcl_path)
 
     def _generate_vivado_tcl(self) -> Path:
@@ -259,7 +259,7 @@ puts "SUCCESS: Build complete!"
             lines.append("export_design -format ip_catalog")
 
         tcl_path.write_text("\n".join(lines), encoding="utf-8")
-        logger.info("✅ %s TCL file generated at: %s", backend.config["tool_command"], tcl_path)
+        logger.info("%s TCL file generated at: %s", backend.config["tool_command"], tcl_path)
         return tcl_path
 
     def print_synthesis_report(self, project_dir: str) -> None:
@@ -267,25 +267,25 @@ puts "SUCCESS: Build complete!"
         project_path = Path(project_dir).resolve()
 
         if not project_path.exists():
-            logger.error("❌ Project directory not found: %s", project_path)
+            logger.error("Project directory not found: %s", project_path)
             logger.info("Please specify a valid project directory or run quick-start first.")
             return
 
         solution_dir = project_path / "solution1"
         if not solution_dir.exists():
-            logger.error("❌ No 'solution1' directory found in: %s", project_path)
+            logger.error("No 'solution1' directory found in: %s", project_path)
             logger.info("Please run synthesis first using:")
             logger.info("  cd %s && vivado_hls -f %s.tcl", project_path, self.config.config["project"]["name"])
             return
 
         report_dir = solution_dir / "syn" / "report"
         if not report_dir.exists():
-            logger.error("❌ No synthesis report directory found: %s", report_dir)
+            logger.error("No synthesis report directory found: %s", report_dir)
             logger.info("Make sure 'csynth_design' completed successfully.")
             return
 
         print(f"\n{'=' * 60}")
-        print(f"📊 SYNTHESIS REPORT: {project_path.name}")
+        print(f" SYNTHESIS REPORT: {project_path.name}")
         print(f"{'=' * 60}")
         self._print_utilization_report(report_dir)
         self._print_timing_report(report_dir)
@@ -294,13 +294,13 @@ puts "SUCCESS: Build complete!"
     def _print_utilization_report(self, report_dir: Path) -> None:
         util_files = sorted(report_dir.glob("*utilization*"))
         if not util_files:
-            logger.warning("📊 Utilization report not found.")
+            logger.warning("Utilization report not found.")
             return
 
         util_file = util_files[0]
-        print("\n🎯 RESOURCE UTILIZATION:")
+        print("\nRESOURCE UTILIZATION:")
         print(f"{'-' * 50}")
-        print(f"📄 File: {util_file.name}")
+        print(f"File: {util_file.name}")
 
         try:
             lines = util_file.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -315,18 +315,18 @@ puts "SUCCESS: Build complete!"
                 if in_table and stripped and any(key in stripped for key in ["BRAM", "DSP", "FF", "LUT", "URAM"]):
                     print(f"  {stripped}")
         except Exception as exc:
-            logger.error("❌ Failed to parse utilization report %s: %s", util_file, exc)
+            logger.error("Failed to parse utilization report %s: %s", util_file, exc)
 
     def _print_timing_report(self, report_dir: Path) -> None:
         timing_files = sorted(report_dir.glob("*timing*"))
         if not timing_files:
-            logger.warning("⏱️ Timing report not found.")
+            logger.warning("Timing report not found.")
             return
 
         timing_file = timing_files[0]
-        print("\n⏱️ TIMING SUMMARY:")
+        print("\n TIMING SUMMARY:")
         print(f"{'-' * 50}")
-        print(f"📄 File: {timing_file.name}")
+        print(f" File: {timing_file.name}")
 
         try:
             lines = timing_file.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -338,10 +338,10 @@ puts "SUCCESS: Build complete!"
                 ) and ("|" in stripped or ":" in stripped):
                     print(f"  {stripped}")
         except Exception as exc:
-            logger.error("❌ Failed to parse timing report %s: %s", timing_file, exc)
+            logger.error(" Failed to parse timing report %s: %s", timing_file, exc)
 
     def _print_synthesis_summary(self, project_path: Path) -> None:
-        print(f"\n📁 PROJECT STATUS: {project_path.name}")
+        print(f"\n PROJECT STATUS: {project_path.name}")
         print(f"{'-' * 50}")
         stages = {
             "C Simulation": (project_path / "solution1" / "csim").exists(),
@@ -350,13 +350,13 @@ puts "SUCCESS: Build complete!"
             "IP Export": (project_path / "solution1" / "impl").exists(),
         }
         for stage, done in stages.items():
-            status = "✅ COMPLETED" if done else "❌ NOT RUN"
+            status = " COMPLETED" if done else "NOT RUN"
             print(f"  {stage:<18} {status}")
 
         if all(stages.values()):
-            print("\n🎉 All synthesis stages completed successfully!")
+            print("\n All synthesis stages completed successfully!")
         else:
-            print("\n💡 To complete synthesis, run:")
+            print("\n To complete synthesis, run:")
             print(f"  cd {project_path} && vivado_hls -f {self.config.config['project']['name']}.tcl")
 
     def generate_report(self, output_file: Optional[str] = None) -> str:
