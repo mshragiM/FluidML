@@ -12,7 +12,7 @@ It is designed for fast end-to-end flow:
 ## Key Features
 
 - End-to-end CLI for training + HLS export
-- Random Forest regression/classification support
+- Random Forest regression support
 - Multi-output regression support
 - Automatic preprocessing and scaling
 - Jinja2-based hardware code generation templates
