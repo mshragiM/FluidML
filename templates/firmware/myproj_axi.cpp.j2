@@ -4,12 +4,12 @@
 #include <hls_stream.h>
 
 // ========================== Dataflow Helper Functions ==========================
-void read_input_stream(hls::stream<input_axi_t>& in, hls::stream<input_t>& in_local, hls::stream<input_axi_t>& last_word_stream) {
+void read_input_stream(hls::stream<input_axi_t>& in, hls::stream<input_t>& in_local, hls::stream<axis_last_t>& last_word_stream) {
 #pragma HLS INLINE off
 
     input_t input_sample;
 #pragma HLS ARRAY_PARTITION variable=input_sample.data complete dim=1
-    input_axi_t last_word;
+    axis_last_t last_word = 0;
 
     // Read N_FEATURES words - optimized with burst hint
     for (unsigned j = 0; j < N_FEATURES; ++j) {
@@ -17,7 +17,7 @@ void read_input_stream(hls::stream<input_axi_t>& in, hls::stream<input_t>& in_lo
         input_axi_t word = in.read();
         input_sample.data[j].range(15, 0) = word.data.range(15, 0);
         if (j == N_FEATURES - 1)
-            last_word = word; // capture last word only
+            last_word = word.last; // capture only the TLAST sideband
     }
     in_local.write(input_sample);
     last_word_stream.write(last_word);
@@ -32,11 +32,11 @@ void process_prediction(hls::stream<input_t>& in_local, hls::stream<result_t>& o
     out_local.write(output_sample);
 }
 
-void write_output_stream(hls::stream<result_t>& out_local, hls::stream<input_axi_t>& last_word_stream, hls::stream<output_axi_t>& out) {
+void write_output_stream(hls::stream<result_t>& out_local, hls::stream<axis_last_t>& last_word_stream, hls::stream<output_axi_t>& out) {
 #pragma HLS INLINE off
 
     result_t result = out_local.read();
-    input_axi_t last_word = last_word_stream.read();
+    axis_last_t last_word = last_word_stream.read();
 
     // Write output - optimized
     for (unsigned j = 0; j < N_TARGETS; ++j) {
@@ -44,7 +44,7 @@ void write_output_stream(hls::stream<result_t>& out_local, hls::stream<input_axi
         output_axi_t pkt;
         pkt.data = 0;
         pkt.data.range(15, 0) = result.data[j].range(15, 0);
-        pkt.last = (last_word.last && j == N_TARGETS - 1) ? 1 : 0;
+        pkt.last = (last_word && j == N_TARGETS - 1) ? 1 : 0;
         pkt.keep = 0xF;
         pkt.strb = 0xF;
         out << pkt;
@@ -60,10 +60,10 @@ void predict_axi(hls::stream<input_axi_t>& in, hls::stream<output_axi_t>& out) {
 
     hls::stream<input_t> in_local("input_1");
     hls::stream<result_t> out_local("output_1");
-    hls::stream<input_axi_t> last_word_stream("last_word");
+    hls::stream<axis_last_t> last_word_stream("last_word");
 #pragma HLS STREAM variable=in_local depth=2
 #pragma HLS STREAM variable=out_local depth=2
-#pragma HLS STREAM variable=last_word_stream depth=2
+#pragma HLS STREAM variable=last_word_stream depth=3
 
     read_input_stream(in, in_local, last_word_stream);
     process_prediction(in_local, out_local);

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import math
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List
@@ -118,10 +119,36 @@ class Jinja2HLSCodeGenerator(CodeGenerator):
         }
         return result
 
+    def _get_model_max_nodes(self, model: Any, n_targets: int) -> int:
+        """Return the maximum node count across all trained trees."""
+        if n_targets > 1:
+            estimators_list = model.estimators_
+        else:
+            estimators_list = [model]
+
+        max_nodes = 0
+        for forest in estimators_list:
+            for tree in forest.estimators_:
+                max_nodes = max(max_nodes, int(tree.tree_.node_count))
+        return max_nodes
+
+    @staticmethod
+    def _bits_for_max_value(max_value: int) -> int:
+        """Minimum unsigned bit width needed to represent [0, max_value]."""
+        return max(1, int(math.ceil(math.log2(max(2, max_value + 1)))))
+
     def _build_context(self, data_manager: DataManager, model: Any = None) -> dict:
         n_features = len(data_manager.feature_cols)
         n_targets = len(data_manager.target_cols)
-        max_nodes = self.config.config["export"]["max_nodes"]
+        configured_max_nodes = int(self.config.config["export"].get("max_nodes", 128))
+        model_max_nodes = 0
+
+        if model is not None:
+            model_max_nodes = self._get_model_max_nodes(model, n_targets)
+
+        max_nodes = max(configured_max_nodes, model_max_nodes)
+        feature_index_bits = self._bits_for_max_value(max(0, n_features - 1))
+        node_index_bits = self._bits_for_max_value(max_nodes)
 
         context = {
             "n_features": n_features,
@@ -129,6 +156,8 @@ class Jinja2HLSCodeGenerator(CodeGenerator):
             "n_trees": self.config.config["model"]["n_estimators"],
             "max_depth": self.config.config["model"]["max_depth"],
             "max_nodes": max_nodes,
+            "feature_index_bits": feature_index_bits,
+            "node_index_bits": node_index_bits,
             "precision_type": self.precision_type,
             "precision": self.config.config["export"]["precision"],
             "feature_cols": list(data_manager.feature_cols),
@@ -144,6 +173,14 @@ class Jinja2HLSCodeGenerator(CodeGenerator):
                 estimators_list = model.estimators_
             else:
                 estimators_list = [model]
+
+            if model_max_nodes > configured_max_nodes:
+                logger.warning(
+                    "Model requires %s nodes per tree, increasing MAX_NNODES from %s to %s.",
+                    model_max_nodes,
+                    configured_max_nodes,
+                    max_nodes,
+                )
 
             n_trees_per_target = len(estimators_list[0].estimators_)
             tree_data = []

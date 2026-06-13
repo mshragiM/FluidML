@@ -229,10 +229,11 @@ puts "SUCCESS: Build complete!"
         lines.append("## Copyright (C) 1986-2020 Xilinx, Inc. All Rights Reserved.")
         lines.append("############################################################")
 
-        if backend.is_vitis() and backend.config["project_upgrade"]:
-            lines.append(f"open_project -upgrade {project_name}")
-        else:
-            lines.append(f"open_project {project_name}")
+        lines.append(f'if {{[file exists "{project_name}"]}} {{')
+        lines.append(f'    file delete -force "{project_name}"')
+        lines.append("}")
+        lines.append(f'file mkdir "{project_name}"')
+        lines.append(f"open_project {project_name}")
 
         lines.append(f"set_top {top_function}")
         lines.extend(f"add_files {file.name}" for file in design_files)
@@ -252,7 +253,10 @@ puts "SUCCESS: Build complete!"
         lines.append('#source "./solution1/directives.tcl"')
         lines.append("csim_design")
         lines.append("csynth_design")
-        lines.append(f"cosim_design -trace_level {backend.config['cosim_trace']}")
+        if backend.is_vitis():
+            lines.append("# cosim_design is skipped by default for Vitis HLS")
+        else:
+            lines.append(f"cosim_design -trace_level {backend.config['cosim_trace']}")
         if backend.is_vitis():
             lines.append(f"export_design -format {backend.config['export_format']}")
         else:

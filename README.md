@@ -76,12 +76,38 @@ This will:
 - save model + metrics
 - generate HLS files and TCL scripts in `energy_pred/`
 
+The legacy wrapper `python rf_cli.py ...` is also supported and accepts the same flags.
+
+## Precision Support
+
+FluidML supports precision overrides directly from the CLI.
+
+Accepted forms:
+
+- `--precision 18.8` -> `ap_fixed<18,8>`
+- `--precision 16.6` -> `ap_fixed<16,6>`
+- `--precision "ap_fixed<20,7>"`
+- `--precision fixed`
+- `--precision float`
+
+Example:
+
+```bash
+python fluidml_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred_p188 --backend vivado_hls --precision 18.8 --verbose
+```
+
 ## Main CLI Commands
 
 ### 1) Quick start
 
 ```bash
 python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir
+```
+
+With backend and precision override:
+
+```bash
+python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir --backend vivado_hls --precision 16.6
 ```
 
 ### 2) Train only
@@ -100,6 +126,13 @@ python fluidml_cli.py export --model model.pkl --output out_dir --backend vivado
 
 ```bash
 python fluidml_cli.py create-config --output fluidml_config.yaml
+```
+
+You can also keep precision in YAML:
+
+```yaml
+export:
+  precision: "ap_fixed<18,8>"
 ```
 
 ### 5) Print synthesis report summary
@@ -130,6 +163,12 @@ cd energy_pred
 vivado_hls -f fluidml_project.tcl
 ```
 
+Example generation command:
+
+```bash
+python fluidml_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred_vivado --backend vivado_hls --precision 18.8 --verbose
+```
+
 ### Bitstream generation (Vivado batch)
 
 ```bash
@@ -140,8 +179,21 @@ vivado -mode batch -source vivado_block_design.tcl
 ### Vitis HLS (optional)
 
 ```bash
-python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --backend vitis_hls --output out_vitis
+python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --backend vitis_hls --output out_vitis --precision 18.8
 ```
+
+Then run:
+
+```bash
+cd out_vitis
+vitis_hls -f fluidml_project.tcl
+```
+
+Notes:
+
+- Vivado HLS and Vitis HLS are both supported.
+- Regenerate the project when switching backend.
+- Using a fresh output directory per backend is recommended, for example `energy_pred_vivado` and `energy_pred_vitis`.
 
 ## Python API Example
 

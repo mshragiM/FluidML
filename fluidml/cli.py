@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import logging
 import pickle
+import re
 import sys
 from pathlib import Path
 from typing import List, Optional
@@ -28,6 +29,52 @@ def _parse_csv_columns(raw: Optional[str]) -> Optional[List[str]]:
 class FluidMLCLI:
     def __init__(self):
         self.parser = self._create_parser()
+
+    @staticmethod
+    def _normalize_precision(value: str) -> str:
+        """Convert user-friendly precision input into config format."""
+        if value is None:
+            return value
+
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError("Precision cannot be empty.")
+
+        lowered = normalized.lower()
+        if lowered in {"float", "fixed"}:
+            return lowered
+
+        if lowered.startswith("ap_fixed<") and lowered.endswith(">"):
+            match = re.fullmatch(r"ap_fixed<\s*(\d+)\s*,\s*(\d+)\s*>", lowered)
+            if not match:
+                raise ValueError(
+                    "Invalid ap_fixed format. Use ap_fixed<total_bits,int_bits>, e.g. ap_fixed<18,8>."
+                )
+            total_bits = int(match.group(1))
+            int_bits = int(match.group(2))
+        else:
+            match = re.fullmatch(r"(\d+)\.(\d+)", normalized)
+            if not match:
+                raise ValueError(
+                    "Invalid precision format. Use float, fixed, ap_fixed<18,8>, or shorthand like 18.8."
+                )
+            total_bits = int(match.group(1))
+            int_bits = int(match.group(2))
+
+        if total_bits <= 0 or int_bits <= 0:
+            raise ValueError("Precision bit widths must be positive.")
+        if int_bits > total_bits:
+            raise ValueError("Integer bits cannot be greater than total bits.")
+
+        return f"ap_fixed<{total_bits},{int_bits}>"
+
+    def _apply_precision_override(self, framework: FluidMLFramework, precision: Optional[str]) -> None:
+        if not precision:
+            return
+
+        normalized = self._normalize_precision(precision)
+        framework.config.config["export"]["precision"] = normalized
+        logger.info("Using precision: %s", normalized)
 
     def _create_parser(self) -> argparse.ArgumentParser:
         parent_parser = argparse.ArgumentParser(add_help=False)
@@ -74,6 +121,10 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         model_group = train_parser.add_argument_group("Model Options")
         model_group.add_argument("--n-estimators", type=int, default=20, help="Number of estimators")
         model_group.add_argument("--max-depth", type=int, default=6, help="Maximum tree depth")
+        model_group.add_argument(
+            "--precision",
+            help="Precision override: float, fixed, ap_fixed<18,8>, or shorthand like 18.8",
+        )
 
         train_parser.add_argument("--config", "-c", help="Configuration file (YAML/JSON)")
         train_parser.add_argument("--output", "-o", default="fluidml_output", help="Output directory")
@@ -87,19 +138,27 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         export_parser.add_argument("--output", "-o", default="fluidml_export", help="Output directory")
         export_parser.add_argument("--export-format", choices=["default", "legacy"], default="legacy", help="Export format")
         export_parser.add_argument("--jinja2", action="store_true", help="Use Jinja2 templates")
+        export_parser.add_argument(
+            "--precision",
+            help="Precision override: float, fixed, ap_fixed<18,8>, or shorthand like 18.8",
+        )
         export_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="HLS synthesis backend")
         export_parser.add_argument("--vitis-flow", choices=["hw", "hw_emu"], default="hw", help="Vitis flow target")
 
     def _add_quickstart_parser(self, subparsers, parent_parser) -> None:
         quick_parser = subparsers.add_parser("quick-start", help="Quick start with automatic configuration", parents=[parent_parser])
-        quick_parser.add_argument("--data", "-d", required=True, help="Path to dataset file or URL")
+        quick_parser.add_argument("--data", "-d", help="Path to dataset file or URL (optional if provided in --config)")
         quick_parser.add_argument("--output", "-o", default="fluidml_quickstart", help="Output directory")
         quick_parser.add_argument("--features", "-f", help="Comma-separated list of feature columns")
         quick_parser.add_argument("--targets", "-t", help="Comma-separated list of target columns")
         quick_parser.add_argument("--export-format", choices=["default", "legacy"], default="legacy", help="Export format")
         quick_parser.add_argument("--jinja2", action="store_true", help="Use Jinja2 templates")
-        quick_parser.add_argument("--n-estimators", type=int, default=20, help="Number of estimators")
-        quick_parser.add_argument("--max-depth", type=int, default=6, help="Maximum tree depth")
+        quick_parser.add_argument("--n-estimators", type=int, default=None, help="Number of estimators (overrides config when set)")
+        quick_parser.add_argument("--max-depth", type=int, default=None, help="Maximum tree depth (overrides config when set)")
+        quick_parser.add_argument(
+            "--precision",
+            help="Precision override: float, fixed, ap_fixed<18,8>, or shorthand like 18.8",
+        )
         quick_parser.add_argument("--config", "-c", help="Configuration file (YAML/JSON)")
         quick_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="HLS synthesis backend")
         quick_parser.add_argument("--vitis-flow", choices=["hw", "hw_emu"], default="hw", help="Vitis flow target")
@@ -158,26 +217,30 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         if args.config:
             framework = FluidMLFramework(args.config)
             logger.info("Using configuration from: %s", args.config)
-            return framework
+        else:
+            framework = FluidMLFramework()
+            framework.config.config["project"]["output_dir"] = args.output
+            framework.config.config["export"]["format"] = getattr(args, "export_format", "legacy")
 
-        framework = FluidMLFramework()
-        framework.config.config["project"]["output_dir"] = args.output
-        framework.config.config["export"]["format"] = getattr(args, "export_format", "legacy")
-        framework.config.config["model"]["n_estimators"] = getattr(args, "n_estimators", framework.config.config["model"]["n_estimators"])
-        framework.config.config["model"]["max_depth"] = getattr(args, "max_depth", framework.config.config["model"]["max_depth"])
-        if hasattr(args, "test_size"):
-            framework.config.config["data"]["test_size"] = args.test_size
+            if getattr(args, "n_estimators", None) is not None:
+                framework.config.config["model"]["n_estimators"] = args.n_estimators
+            if getattr(args, "max_depth", None) is not None:
+                framework.config.config["model"]["max_depth"] = args.max_depth
+            if hasattr(args, "test_size"):
+                framework.config.config["data"]["test_size"] = args.test_size
 
-        backend = getattr(args, "backend", "vivado_hls")
-        framework.config.set_backend(backend)
-        if backend == "vitis_hls":
-            framework.config.config["hls"]["vitis_flow_target"] = getattr(args, "vitis_flow", "hw")
-            if getattr(args, "fpga_part", None):
-                framework.config.config["export"]["fpga_part"] = args.fpga_part
-                framework.config.config["hls"]["target_device"] = args.fpga_part
-            if getattr(args, "clock_period", None):
-                framework.config.config["export"]["clock_period"] = args.clock_period
-                framework.config.config["hls"]["clock_period"] = f"{args.clock_period}ns"
+            backend = getattr(args, "backend", "vivado_hls")
+            framework.config.set_backend(backend)
+            if backend == "vitis_hls":
+                framework.config.config["hls"]["vitis_flow_target"] = getattr(args, "vitis_flow", "hw")
+                if getattr(args, "fpga_part", None):
+                    framework.config.config["export"]["fpga_part"] = args.fpga_part
+                    framework.config.config["hls"]["target_device"] = args.fpga_part
+                if getattr(args, "clock_period", None):
+                    framework.config.config["export"]["clock_period"] = args.clock_period
+                    framework.config.config["hls"]["clock_period"] = f"{args.clock_period}ns"
+
+        self._apply_precision_override(framework, getattr(args, "precision", None))
         return framework
 
     def _handle_train(self, args) -> int:
@@ -234,12 +297,27 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         logger.info("FluidML Quick Start")
         logger.info("=" * 40)
         framework = self._build_framework(args)
+        if args.config:
+            if args.n_estimators is not None:
+                framework.config.config["model"]["n_estimators"] = args.n_estimators
+            if args.max_depth is not None:
+                framework.config.config["model"]["max_depth"] = args.max_depth
 
         logger.info("Using HLS backend: %s", framework.config.backend.backend)
-        logger.info("Loading data from: %s", args.data)
-        feature_cols = _parse_csv_columns(args.features)
-        target_cols = _parse_csv_columns(args.targets)
-        framework.load_data(args.data, feature_cols, target_cols)
+        config_data = framework.config.config.get("data", {})
+
+        data_source = args.data
+        if not data_source:
+            data_source = config_data.get("source") or config_data.get("url") or config_data.get("path")
+        if not data_source:
+            logger.error("No dataset provided. Use --data/-d or define one of data.source/data.url/data.path in config.")
+            return 1
+
+        feature_cols = _parse_csv_columns(args.features) if args.features else (config_data.get("feature_cols") or config_data.get("features"))
+        target_cols = _parse_csv_columns(args.targets) if args.targets else (config_data.get("target_cols") or config_data.get("targets"))
+
+        logger.info("Loading data from: %s", data_source)
+        framework.load_data(data_source, feature_cols, target_cols)
 
         logger.info("Training model with automatic configuration...")
         metrics = framework.train()
@@ -253,21 +331,22 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         framework.export_to_hls_j2()
         framework.generate_report()
 
+        output_dir = framework.config.config.get("project", {}).get("output_dir", args.output)
         logger.info("\nQuick start completed!")
-        logger.info("Check results in: %s", framework.config.config["project"]["output_dir"])
+        logger.info("Check results in: %s", output_dir)
         logger.info("Backend: %s", backend)
         if backend == "vitis_hls":
             logger.info("\nTo run Vitis HLS synthesis:")
-            logger.info("   cd %s", framework.config.config["project"]["output_dir"])
+            logger.info("   cd %s", output_dir)
             logger.info("   vitis_hls -f %s.tcl", framework.config.config["project"]["name"])
         else:
             logger.info("\nTo run Vivado HLS synthesis:")
-            logger.info("   cd %s", framework.config.config["project"]["output_dir"])
+            logger.info("   cd %s", output_dir)
             logger.info("   vivado_hls -f %s.tcl", framework.config.config["project"]["name"])
             logger.info("\nAfter HLS export, generate bitstream:")
             logger.info(
                 "   cd %s && vivado -mode batch -source vivado_block_design.tcl",
-                framework.config.config["project"]["output_dir"],
+                output_dir,
             )
         return 0
 
@@ -323,7 +402,10 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
 
 
 def main(argv=None) -> int:
-    print(get_logo("bold"))
+    try:
+        print(get_logo("bold"))
+    except UnicodeEncodeError:
+        print("FluidML")
     cli = FluidMLCLI()
     try:
         return cli.run(argv)

@@ -37,6 +37,7 @@ typedef {{ precision_type }} score_t;
 // AXI types (32-bit float-compatible)
 typedef ap_axiu<32, 0, 0, 0> input_axi_t;
 typedef ap_axiu<32, 0, 0, 0> output_axi_t;
+typedef ap_uint<1> axis_last_t;
 
 
 
@@ -55,13 +56,13 @@ struct result_t {
 // Tree model structure
 // --------------------------------------------------
 struct TreeData {
-    ap_uint<3>  feature[MAX_NNODES];
+    ap_uint<{{ feature_index_bits }}>  feature[MAX_NNODES];
     threshold_t threshold[MAX_NNODES];
     score_t     value[MAX_NNODES];
-    ap_uint<8>  left[MAX_NNODES];
-    ap_uint<8>  right[MAX_NNODES];
+    ap_uint<{{ node_index_bits }}>  left[MAX_NNODES];
+    ap_uint<{{ node_index_bits }}>  right[MAX_NNODES];
     ap_uint<1>  is_leaf[MAX_NNODES];
-    ap_uint<8>  nnodes;
+    ap_uint<{{ node_index_bits }}>  nnodes;
 };
 
 // --------------------------------------------------
