@@ -9,7 +9,7 @@ description = "Train Random Forest models and export HLS-ready FPGA inference co
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-authors = [{ name = "Mogammed Mshragi" }]
+authors = [{ name = "Mohammed Mshragi" }]
 keywords = ["machine-learning", "fpga", "hls", "vivado", "vitis", "random-forest"]
 classifiers = [
   "Development Status :: 4 - Beta",
