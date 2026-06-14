@@ -109,6 +109,16 @@ With backend and precision override:
 python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir --backend vivado_hls --precision 16.6
 ```
 
+Classification examples:
+
+```bash
+python fluidml_cli.py quick-start --data iris.csv --features sepal_length,sepal_width,petal_length,petal_width --targets species --task classification --backend vitis_hls --precision 18.8 --output iris_classifier --verbose
+```
+
+```bash
+python fluidml_cli.py quick-start --data digits.csv --targets digit --task classification --backend vivado_hls --precision 18.8 --output digits_classifier --verbose
+```
+
 ### 2) Train only
 
 ```bash
