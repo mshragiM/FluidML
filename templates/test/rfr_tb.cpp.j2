@@ -5,15 +5,25 @@
 #include <fstream>
 #include "rfr_common.h"
 #include "rf_trees_array.h"
+#include "bitcast_utils.h"
 #include "X_test.h"
+{% if is_regression %}
 #include "scaler_constants.h"
+{% endif %}
 #include <hls_stream.h>
 
 extern void predict_axi(hls::stream<input_axi_t>& in, hls::stream<output_axi_t>& out);
 
+{% if is_regression %}
 inline float unscale(float val, int target_idx) {
     return val * y_range[target_idx] + y_min[target_idx];
 }
+{% else %}
+inline float unscale(float val, int target_idx) {
+    (void)target_idx;
+    return val;
+}
+{% endif %}
 
 int main(int argc, char* argv[]) {
     int n_samples = X_TEST_SAMPLES;
@@ -22,7 +32,7 @@ int main(int argc, char* argv[]) {
     }
 
     const char* target_names[] = { {% for name in target_names %}"{{ name }}"{% if not loop.last %}, {% endif %}{% endfor %} };
-    const float tolerance = 1.0;
+    const float tolerance = {% if is_classification %}0.05{% else %}1.0{% endif %};
 
     const int x_test_rows = X_TEST_SAMPLES;
     if (n_samples > x_test_rows) {
@@ -38,8 +48,7 @@ int main(int argc, char* argv[]) {
     for (int s = 0; s < n_samples; ++s) {
         for (int f = 0; f < N_FEATURES; ++f) {
             input_axi_t pkt;
-            pkt.data = 0;
-            pkt.data.range(15, 0) = X_test[s][f].range(15, 0);
+            pkt.data = feature_to_bits(X_test[s][f]);
             pkt.keep = 0xF;
             pkt.strb = 0xF;
             pkt.last = (f == N_FEATURES - 1 && s == n_samples - 1) ? 1 : 0;
@@ -85,9 +94,7 @@ int main(int argc, char* argv[]) {
             output_axi_t pkt;
             out_stream.read(pkt);
 
-            ap_int<18> raw18 = pkt.data.range(15, 0);
-            score_t axi_val_fp;
-            axi_val_fp.range(15, 0) = raw18;
+            score_t axi_val_fp = bits_to_score(pkt.data);
             float axi_val = unscale(static_cast<float>(axi_val_fp), t);
             float ref_val = unscale(static_cast<float>(ref_output.data[t]), t);
 

@@ -91,6 +91,8 @@ class ModelTrainer:
                         metrics[f"r2_{target}"] = 0.0
         else:
             try:
+                if y_test.ndim == 2 and y_test.shape[1] == 1:
+                    y_test = y_test.ravel()
                 metrics["accuracy"] = accuracy_score(y_test, y_pred)
             except Exception as exc:
                 logger.warning("Accuracy calculation failed: %s", exc)

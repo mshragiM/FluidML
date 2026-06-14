@@ -39,6 +39,7 @@ energy_pred/
 fluidml_output/
 fluidml_export/
 fluidml_quickstart/
+fluidml_project/
 
 # Local synthesis/build artifacts
 *.log
@@ -50,3 +51,11 @@ fluidml_quickstart/
 
 # Local notebooks/checkpoints
 .ipynb_checkpoints/
+.virtual_documents/
+
+# Tutorial notebook outputs
+tutorial_datasets/
+tutorial_regression/
+tutorial_iris/
+tutorial_digits/
+tutorial_hvac/

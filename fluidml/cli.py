@@ -122,6 +122,11 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         model_group.add_argument("--n-estimators", type=int, default=20, help="Number of estimators")
         model_group.add_argument("--max-depth", type=int, default=6, help="Maximum tree depth")
         model_group.add_argument(
+            "--task",
+            choices=["regression", "classification"],
+            help="Learning task type (regression or classification)",
+        )
+        model_group.add_argument(
             "--precision",
             help="Precision override: float, fixed, ap_fixed<18,8>, or shorthand like 18.8",
         )
@@ -155,6 +160,11 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         quick_parser.add_argument("--jinja2", action="store_true", help="Use Jinja2 templates")
         quick_parser.add_argument("--n-estimators", type=int, default=None, help="Number of estimators (overrides config when set)")
         quick_parser.add_argument("--max-depth", type=int, default=None, help="Maximum tree depth (overrides config when set)")
+        quick_parser.add_argument(
+            "--task",
+            choices=["regression", "classification"],
+            help="Learning task type (regression or classification)",
+        )
         quick_parser.add_argument(
             "--precision",
             help="Precision override: float, fixed, ap_fixed<18,8>, or shorthand like 18.8",
@@ -226,6 +236,8 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
                 framework.config.config["model"]["n_estimators"] = args.n_estimators
             if getattr(args, "max_depth", None) is not None:
                 framework.config.config["model"]["max_depth"] = args.max_depth
+            if getattr(args, "task", None):
+                framework.config.config["model"]["task"] = args.task
             if hasattr(args, "test_size"):
                 framework.config.config["data"]["test_size"] = args.test_size
 
@@ -302,6 +314,8 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
                 framework.config.config["model"]["n_estimators"] = args.n_estimators
             if args.max_depth is not None:
                 framework.config.config["model"]["max_depth"] = args.max_depth
+            if args.task:
+                framework.config.config["model"]["task"] = args.task
 
         logger.info("Using HLS backend: %s", framework.config.backend.backend)
         config_data = framework.config.config.get("data", {})

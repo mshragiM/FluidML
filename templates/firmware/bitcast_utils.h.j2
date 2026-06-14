@@ -10,25 +10,61 @@ union float_bits {
     ap_uint<32> i;
 };
 
-inline ap_uint<32> fixed_to_bits(score_t val) {
-    return *((ap_uint<32>*)&val);
+inline ap_uint<32> feature_to_bits(feature_t val) {
+    float_bits bits;
+    bits.f = val;
+    return bits.i;
 }
 
-inline score_t bits_to_fixed(ap_uint<32> val) {
-    return *((score_t*)&val);
+inline feature_t bits_to_feature(ap_uint<32> val) {
+    float_bits bits;
+    bits.i = val;
+    return bits.f;
+}
+
+inline ap_uint<32> score_to_bits(score_t val) {
+    float_bits bits;
+    bits.f = val;
+    return bits.i;
+}
+
+inline score_t bits_to_score(ap_uint<32> val) {
+    float_bits bits;
+    bits.i = val;
+    return bits.f;
 }
 {% else %}
-inline ap_uint<32> fixed_to_bits(score_t val) {
+inline ap_uint<32> feature_to_bits(feature_t val) {
     ap_uint<32> result = 0;
-    result.range(15, 0) = val & 0xFFFF;
-    if (val & 0x8000) result.range(31, 16) = 0xFFFF;
+    result.range({{ feature_total_bits - 1 }}, 0) = val.range({{ feature_total_bits - 1 }}, 0);
     return result;
 }
 
-inline score_t bits_to_fixed(ap_uint<32> val) {
-    score_t result = (val.range(15, 0) & 0xFFFF) | (val[15] ? 0xFFFF0000 : 0);
+inline feature_t bits_to_feature(ap_uint<32> val) {
+    feature_t result = 0;
+    result.range({{ feature_total_bits - 1 }}, 0) = val.range({{ feature_total_bits - 1 }}, 0);
+    return result;
+}
+
+inline ap_uint<32> score_to_bits(score_t val) {
+    ap_uint<32> result = 0;
+    result.range({{ score_total_bits - 1 }}, 0) = val.range({{ score_total_bits - 1 }}, 0);
+    return result;
+}
+
+inline score_t bits_to_score(ap_uint<32> val) {
+    score_t result = 0;
+    result.range({{ score_total_bits - 1 }}, 0) = val.range({{ score_total_bits - 1 }}, 0);
     return result;
 }
 {% endif %}
+
+inline ap_uint<32> fixed_to_bits(score_t val) {
+    return score_to_bits(val);
+}
+
+inline score_t bits_to_fixed(ap_uint<32> val) {
+    return bits_to_score(val);
+}
 
 #endif

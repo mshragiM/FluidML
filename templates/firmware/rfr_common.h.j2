@@ -11,6 +11,7 @@
 // --------------------------------------------------
 #define N_FEATURES {{ n_features }}
 #define N_TARGETS {{ n_targets }}
+#define N_FORESTS {{ n_forests }}
 #define N_TREES_PER_TARGET {{ n_trees }}
 #define MAX_TREE_DEPTH {{ max_depth }}
 #define MAX_NNODES {{ max_nodes }}
@@ -58,7 +59,11 @@ struct result_t {
 struct TreeData {
     ap_uint<{{ feature_index_bits }}>  feature[MAX_NNODES];
     threshold_t threshold[MAX_NNODES];
+{% if is_classification %}
+    score_t     value[MAX_NNODES][N_TARGETS];
+{% else %}
     score_t     value[MAX_NNODES];
+{% endif %}
     ap_uint<{{ node_index_bits }}>  left[MAX_NNODES];
     ap_uint<{{ node_index_bits }}>  right[MAX_NNODES];
     ap_uint<1>  is_leaf[MAX_NNODES];
@@ -70,6 +75,10 @@ struct TreeData {
 // --------------------------------------------------
 void predict_axi(hls::stream<input_axi_t>& in, hls::stream<output_axi_t>& out);
 void predict_array(const input_t &input, result_t &output);
+{% if is_classification %}
+ap_uint<{{ node_index_bits }}> traverse_tree_index(const feature_t features[N_FEATURES], const TreeData& tree_data);
+{% else %}
 score_t traverse_tree_array(const feature_t features[N_FEATURES], const TreeData& tree_data);
+{% endif %}
 
 #endif // RFR_COMMON_H

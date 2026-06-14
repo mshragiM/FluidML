@@ -68,7 +68,7 @@ class FluidMLFramework:
             _, x_test, _, _ = self.data_manager.prepare_data()
         generated_files["test"] = [
             self.code_generator.generate_x_test_header(x_test),
-            self.code_generator.generate_rfr_tb(self.data_manager.target_cols),
+            self.code_generator.generate_rfr_tb(self._get_output_names(), self.config.config["model"]["task"]),
         ]
 
         generated_files["build"] = self._generate_build_scripts()
@@ -87,7 +87,10 @@ class FluidMLFramework:
 
         np.save(output_dir / "X_test.npy", x_test)
         np.save(output_dir / "Y_test.npy", y_test)
-        np.save(output_dir / "Y_pred.npy", self.model.predict(x_test))
+        y_pred = self.model.predict(x_test)
+        np.save(output_dir / "Y_pred.npy", y_pred)
+        if self.config.config["model"]["task"] == "classification" and hasattr(self.model, "predict_proba"):
+            np.save(output_dir / "Y_pred_proba.npy", self.model.predict_proba(x_test))
 
         with (output_dir / "fluidml_model.pkl").open("wb") as file:
             pkl.dump(self.model, file)
@@ -104,6 +107,14 @@ class FluidMLFramework:
         self.config.save_config(str(output_dir / "fluidml_config.yaml"))
         with (output_dir / "fluidml_metrics.json").open("w", encoding="utf-8") as file:
             json.dump(self.metrics, file, indent=2)
+
+    def _get_output_names(self) -> List[str]:
+        task = self.config.config["model"]["task"]
+        if task == "classification":
+            if self.model is None or not hasattr(self.model, "classes_"):
+                raise ValueError("Classification output names require a trained model with classes_.")
+            return [f"class_{cls}" for cls in self.model.classes_]
+        return list(self.data_manager.target_cols or [])
 
     def _generate_build_scripts(self) -> List[str]:
         # Placeholder for future build-script generation.
@@ -229,15 +240,18 @@ puts "SUCCESS: Build complete!"
         lines.append("## Copyright (C) 1986-2020 Xilinx, Inc. All Rights Reserved.")
         lines.append("############################################################")
 
-        lines.append(f'if {{[file exists "{project_name}"]}} {{')
-        lines.append(f'    file delete -force "{project_name}"')
+        lines.append("set script_dir [file dirname [file normalize [info script]]]")
+        lines.append(f'set project_dir [file join $script_dir "{project_name}"]')
+        lines.append("cd $script_dir")
+        lines.append("if {[file exists $project_dir]} {")
+        lines.append("    file delete -force $project_dir")
         lines.append("}")
-        lines.append(f'file mkdir "{project_name}"')
+        lines.append("file mkdir $project_dir")
         lines.append(f"open_project {project_name}")
 
         lines.append(f"set_top {top_function}")
-        lines.extend(f"add_files {file.name}" for file in design_files)
-        lines.extend(f"add_files -tb {file.name}" for file in tb_files)
+        lines.extend(f'add_files [file join $script_dir "{file.name}"]' for file in design_files)
+        lines.extend(f'add_files -tb [file join $script_dir "{file.name}"]' for file in tb_files)
 
         if backend.is_vitis() and backend.config["flow_target"]:
             lines.append(f'open_solution -flow_target {backend.config["flow_target"]} "solution1"')
@@ -261,6 +275,7 @@ puts "SUCCESS: Build complete!"
             lines.append(f"export_design -format {backend.config['export_format']}")
         else:
             lines.append("export_design -format ip_catalog")
+        lines.append("exit")
 
         tcl_path.write_text("\n".join(lines), encoding="utf-8")
         logger.info("%s TCL file generated at: %s", backend.config["tool_command"], tcl_path)

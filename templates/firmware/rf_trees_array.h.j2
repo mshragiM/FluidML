@@ -5,7 +5,7 @@
 #include "ap_fixed.h"
 #include "ap_int.h"
 
-{% for target_idx in range(n_targets) %}
+{% for target_idx in range(n_forests) %}
 {% for tree_idx in range(n_trees_per_target) %}
 {% set tree = tree_data[target_idx][tree_idx] %}
 static const TreeData target{{ target_idx }}_tree{{ tree_idx }} = {
@@ -16,7 +16,11 @@ static const TreeData target{{ target_idx }}_tree{{ tree_idx }} = {
     { {% for val in tree.thresholds %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} },
     
     // Leaf values/scores
+{% if is_classification %}
+    { {% for row in tree.node_values %}{ {% for val in row %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} }{% if not loop.last %}, {% endif %}{% endfor %} },
+{% else %}
     { {% for val in tree.node_values %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} },
+{% endif %}
     // Left child indices
     { {% for val in tree.left_children %}{{ val }}{% if not loop.last %}, {% endif %}{% endfor %} },
     
@@ -33,6 +37,6 @@ static const TreeData target{{ target_idx }}_tree{{ tree_idx }} = {
 {% endfor %}
 
 // Declare target_trees
-extern const TreeData target_trees[{{ n_targets }}][{{ n_trees_per_target }}];
+extern const TreeData target_trees[{{ n_forests }}][{{ n_trees_per_target }}];
 
 #endif // RF_TREES_ARRAY_H_

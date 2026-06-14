@@ -25,6 +25,7 @@ class DataManager:
         self.data = None
         self.feature_cols: Optional[List[str]] = None
         self.target_cols: Optional[List[str]] = None
+        self.class_labels = None
         self.data_source = None
 
     def load_data(
@@ -50,7 +51,8 @@ class DataManager:
                 if not self.target_cols:
                     self.target_cols = [numeric_cols[-1]]
                 if not self.feature_cols:
-                    self.feature_cols = numeric_cols[: -len(self.target_cols)]
+                    excluded_targets = set(self.target_cols)
+                    self.feature_cols = [col for col in numeric_cols if col not in excluded_targets]
 
             missing_cols = set(self.feature_cols + self.target_cols) - set(self.data.columns)
             if missing_cols:
@@ -74,20 +76,37 @@ class DataManager:
 
         x_data = self.data[self.feature_cols].values
         y_data = self.data[self.target_cols].values
+        task = self.config.config["model"]["task"]
+
+        if task == "classification":
+            if len(self.target_cols) != 1:
+                raise NotImplementedError("Classification export currently supports exactly one target column.")
+            self.class_labels = [
+                label.item() if hasattr(label, "item") else label
+                for label in pd.unique(self.data[self.target_cols[0]])
+            ]
 
         if len(x_data) == 0 or len(y_data) == 0:
             raise ValueError("No data available after loading")
 
-        if np.any(np.isnan(x_data)) or np.any(np.isnan(y_data)):
+        if np.any(pd.isna(x_data)) or np.any(pd.isna(y_data)):
             logger.warning("Data contains NaN values, filling with zeros")
             x_data = np.nan_to_num(x_data)
-            y_data = np.nan_to_num(y_data)
+            if task == "regression":
+                y_data = np.nan_to_num(y_data)
+            else:
+                raise ValueError("Classification targets contain missing values. Please clean the dataset first.")
+
+        stratify = None
+        if task == "classification" and y_data.ndim == 2 and y_data.shape[1] == 1:
+            stratify = y_data.ravel()
 
         x_train, x_test, y_train, y_test = train_test_split(
             x_data,
             y_data,
             test_size=self.config.config["data"]["test_size"],
             random_state=self.config.config["model"]["random_state"],
+            stratify=stratify,
         )
 
         if len(x_test) == 0:
@@ -111,7 +130,7 @@ class DataManager:
             x_train = self.scaler_x.fit_transform(x_train)
             x_test = self.scaler_x.transform(x_test)
 
-        if self.config.config["model"]["task"] == "regression":
+        if task == "regression":
             self.scaler_y = MinMaxScaler()
             y_train = self.scaler_y.fit_transform(y_train)
             y_test = self.scaler_y.transform(y_test)

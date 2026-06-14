@@ -119,6 +119,12 @@ python fluidml_cli.py quick-start --data iris.csv --features sepal_length,sepal_
 python fluidml_cli.py quick-start --data digits.csv --targets digit --task classification --backend vivado_hls --precision 18.8 --output digits_classifier --verbose
 ```
 
+Real-world HVAC regression example:
+
+```bash
+python rf_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons,Therm_Eng_Cons,PMV --backend vivado_hls --precision 18.8 --output hvac_multi_target --verbose
+```
+
 ### 2) Train only
 
 ```bash
@@ -203,6 +209,20 @@ Notes:
 - Vivado HLS and Vitis HLS are both supported.
 - Regenerate the project when switching backend.
 - Using a fresh output directory per backend is recommended, for example `energy_pred_vivado` and `energy_pred_vitis`.
+
+## Tutorial Notebook
+
+For a student-friendly walkthrough, open:
+
+- `FluidML_Tutorial_Regression_Iris_Digits.ipynb`
+
+The notebook covers:
+
+- multi-target HVAC regression
+- iris classification
+- digits classification
+- CLI-based project generation
+- HLS output validation against Python baseline predictions
 
 ## Python API Example
 

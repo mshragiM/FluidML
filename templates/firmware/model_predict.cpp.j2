@@ -3,9 +3,9 @@
 #include "rf_trees_array.h"
 
 // Define target_trees
-const TreeData target_trees[N_TARGETS][N_TREES_PER_TARGET] = {
-{% for target_idx in range(n_targets) %}
-    // Target {{ target_idx }}: {{ target_cols[target_idx] if target_cols else target_idx }}
+const TreeData target_trees[N_FORESTS][N_TREES_PER_TARGET] = {
+{% for target_idx in range(n_forests) %}
+    // Forest {{ target_idx }}: {{ forest_names[target_idx] if forest_names else target_idx }}
     { {% for tree_name in target_trees_list[target_idx] %}{{ tree_name }}{% if not loop.last %}, {% endif %}{% endfor %} }{% if not loop.last %},{% endif %}
 {% endfor %}
 };

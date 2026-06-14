@@ -10,7 +10,7 @@ def logo_bold() -> str:
   ██║     ███████╗╚██████╔╝██║██████╔╝    ██║ ╚═╝ ██║███████╗
   ╚═╝     ╚══════╝ ╚═════╝ ╚═╝╚═════╝     ╚═╝     ╚═╝╚══════╝
                                                             
-                 FluidML by Mogammed Mshragi
+                 FluidML by Mohammed Mshragi
 """
 
 
@@ -25,7 +25,7 @@ def logo_boxed() -> str:
   ║  ██║     ███████╗╚██████╔╝██║██████╔╝    ██║ ╚═╝ ██║███████╗    ║
   ║  ╚═╝     ╚══════╝ ╚═════╝ ╚═╝╚═════╝     ╚═╝     ╚═╝╚══════╝    ║
   ║                                                                  ║
-  ║                 FluidML by Mogammed Mshragi                     ║
+  ║                 FluidML by Mohammed Mshragi                     ║
   ╚══════════════════════════════════════════════════════════════════╝
 """
 
@@ -35,7 +35,7 @@ def logo_minimal() -> str:
     ╔═══════════════════════════╗
     ║     FluidML v1.1          ║
     ║     ML + HLS Framework    ║
-    ║     Mogammed Mshragi      ║
+    ║     Mohammed Mshragi      ║
     ╚═══════════════════════════╝
 """
 
