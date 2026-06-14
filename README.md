@@ -212,7 +212,7 @@ Notes:
 
 ## Tutorial Notebook
 
-For a student-friendly walkthrough, open:
+For a walkthrough covering end-to-end framework usage, open:
 
 - `FluidML_Tutorial_Regression_Iris_Digits.ipynb`
 
