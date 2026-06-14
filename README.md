@@ -60,7 +60,6 @@ Install quickly:
 ```bash
 pip install numpy pandas scikit-learn jinja2 pyyaml
 ```
-
 ## Quick Start (Ex. Energy Dataset)
 
 From repository root:
