@@ -1,4 +1,4 @@
-"""Configuration models for FluidML."""
+"""Configuration models for Cambium."""
 
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ class HLSBackendConfig:
         return self.backend == self.VITIS_HLS
 
 
-class FluidMLConfig:
+class CambiumConfig:
     """User/project configuration container."""
 
     def __init__(self, config_file: Optional[str] = None):
@@ -76,8 +76,8 @@ class FluidMLConfig:
     def _load_default_config(self) -> Dict:
         return {
             "project": {
-                "name": "fluidml_project",
-                "output_dir": "fluidml_output",
+                "name": "cambium_project",
+                "output_dir": "cambium_output",
                 "target": "hls",
             },
             "model": {

@@ -1,0 +1,20 @@
+#include "rf_trees_bram.h"
+
+TreeData bram_trees[{{ n_targets }} * {{ n_trees_per_target }}];
+#pragma HLS BIND_STORAGE variable=bram_trees type=ram_2p impl=bram
+
+void init_bram_trees() {
+#pragma HLS INLINE off
+    for (int i = 0; i < {{ n_targets }} * {{ n_trees_per_target }}; i++) {
+        bram_trees[i].nnodes = 1;
+        for (int j = 0; j < {{ max_nodes }}; j++) {
+#pragma HLS PIPELINE II=1
+            bram_trees[i].feature[j] = 0;
+            bram_trees[i].threshold[j] = 0;
+            bram_trees[i].value[j] = 0;
+            bram_trees[i].left[j] = 0;
+            bram_trees[i].right[j] = 0;
+            bram_trees[i].is_leaf[j] = 1;
+        }
+    }
+}

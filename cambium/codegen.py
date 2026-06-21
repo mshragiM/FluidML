@@ -12,7 +12,7 @@ from typing import Any, Dict, List
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
 
-from .config import FluidMLConfig
+from .config import CambiumConfig
 from .data import DataManager
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ def _resolve_template_dir() -> Path:
 class CodeGenerator(ABC):
     """Abstract base class for code generators."""
 
-    def __init__(self, config: FluidMLConfig):
+    def __init__(self, config: CambiumConfig):
         self.config = config
         self.output_dir = Path(config.config["project"]["output_dir"])
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -61,7 +61,7 @@ class CodeGenerator(ABC):
 class Jinja2HLSCodeGenerator(CodeGenerator):
     """Jinja2-based HLS code generator."""
 
-    def __init__(self, config: FluidMLConfig):
+    def __init__(self, config: CambiumConfig):
         super().__init__(config)
         template_dir = _resolve_template_dir()
         self.env = Environment(

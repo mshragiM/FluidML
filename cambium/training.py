@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.metrics import accuracy_score, r2_score
 from sklearn.multioutput import MultiOutputRegressor
 
-from .config import FluidMLConfig
+from .config import CambiumConfig
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class ModelTrainer:
     """Handles model training and evaluation."""
 
-    def __init__(self, config: FluidMLConfig):
+    def __init__(self, config: CambiumConfig):
         self.config = config
         self.model = None
         self.training_metrics: Dict[str, float] = {}

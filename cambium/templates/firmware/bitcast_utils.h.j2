@@ -1,0 +1,70 @@
+#ifndef BITCAST_UTILS_H
+#define BITCAST_UTILS_H
+
+#include <ap_fixed.h>
+#include "rfr_common.h"
+
+{% if precision == 'float' %}
+union float_bits {
+    float f;
+    ap_uint<32> i;
+};
+
+inline ap_uint<32> feature_to_bits(feature_t val) {
+    float_bits bits;
+    bits.f = val;
+    return bits.i;
+}
+
+inline feature_t bits_to_feature(ap_uint<32> val) {
+    float_bits bits;
+    bits.i = val;
+    return bits.f;
+}
+
+inline ap_uint<32> score_to_bits(score_t val) {
+    float_bits bits;
+    bits.f = val;
+    return bits.i;
+}
+
+inline score_t bits_to_score(ap_uint<32> val) {
+    float_bits bits;
+    bits.i = val;
+    return bits.f;
+}
+{% else %}
+inline ap_uint<32> feature_to_bits(feature_t val) {
+    ap_uint<32> result = 0;
+    result.range({{ feature_total_bits - 1 }}, 0) = val.range({{ feature_total_bits - 1 }}, 0);
+    return result;
+}
+
+inline feature_t bits_to_feature(ap_uint<32> val) {
+    feature_t result = 0;
+    result.range({{ feature_total_bits - 1 }}, 0) = val.range({{ feature_total_bits - 1 }}, 0);
+    return result;
+}
+
+inline ap_uint<32> score_to_bits(score_t val) {
+    ap_uint<32> result = 0;
+    result.range({{ score_total_bits - 1 }}, 0) = val.range({{ score_total_bits - 1 }}, 0);
+    return result;
+}
+
+inline score_t bits_to_score(ap_uint<32> val) {
+    score_t result = 0;
+    result.range({{ score_total_bits - 1 }}, 0) = val.range({{ score_total_bits - 1 }}, 0);
+    return result;
+}
+{% endif %}
+
+inline ap_uint<32> fixed_to_bits(score_t val) {
+    return score_to_bits(val);
+}
+
+inline score_t bits_to_fixed(ap_uint<32> val) {
+    return bits_to_score(val);
+}
+
+#endif

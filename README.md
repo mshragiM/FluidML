@@ -1,6 +1,6 @@
-# FluidML
+# Cambium
 
-FluidML is a Python framework that trains Random Forest models and exports FPGA-ready HLS inference code for Xilinx Vivado HLS / Vitis HLS workflows.
+Cambium is a Python framework that trains Random Forest models and exports FPGA-ready HLS inference code for Xilinx Vivado HLS / Vitis HLS workflows.
 
 It is designed for fast end-to-end flow:
 
@@ -27,8 +27,8 @@ It is designed for fast end-to-end flow:
 ## Repository Structure
 
 ```text
-FluidML/
-|-- fluidml/
+Cambium/
+|-- cambium/
 |   |-- __init__.py
 |   |-- cli.py
 |   |-- config.py
@@ -39,9 +39,7 @@ FluidML/
 |-- templates/
 |   |-- firmware/
 |   `-- test/
-|-- fluidml_cli.py          # Main CLI entrypoint
-|-- rf_cli.py               # Legacy compatibility wrapper
-|-- rf_framework.py         # Legacy compatibility wrapper
+|-- cambium_cli.py          # Main CLI entrypoint
 `-- README.md
 ```
 
@@ -60,12 +58,24 @@ Install quickly:
 ```bash
 pip install numpy pandas scikit-learn jinja2 pyyaml
 ```
+
+Install from PyPI:
+
+```bash
+pip install cambium-hls
+```
+
+Python import:
+
+```python
+from cambium import CambiumFramework
+```
 ## Quick Start (Ex. Energy Dataset)
 
 From repository root:
 
 ```bash
-python fluidml_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred --verbose
+python cambium_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred --verbose
 ```
 
 This will:
@@ -75,11 +85,9 @@ This will:
 - save model + metrics
 - generate HLS files and TCL scripts in `energy_pred/`
 
-The legacy wrapper `python rf_cli.py ...` is also supported and accepts the same flags.
-
 ## Precision Support
 
-FluidML supports precision overrides directly from the CLI.
+Cambium supports precision overrides directly from the CLI.
 
 Accepted forms:
 
@@ -92,7 +100,7 @@ Accepted forms:
 Example:
 
 ```bash
-python fluidml_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred_p188 --backend vivado_hls --precision 18.8 --verbose
+python cambium_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred_p188 --backend vivado_hls --precision 18.8 --verbose
 ```
 
 ## Main CLI Commands
@@ -100,47 +108,47 @@ python fluidml_cli.py quick-start --data https://raw.githubusercontent.com/AbuAl
 ### 1) Quick start
 
 ```bash
-python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir
+python cambium_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir
 ```
 
 With backend and precision override:
 
 ```bash
-python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir --backend vivado_hls --precision 16.6
+python cambium_cli.py quick-start --data data.csv --features f1,f2 --targets y --output out_dir --backend vivado_hls --precision 16.6
 ```
 
 Classification examples:
 
 ```bash
-python fluidml_cli.py quick-start --data iris.csv --features sepal_length,sepal_width,petal_length,petal_width --targets species --task classification --backend vitis_hls --precision 18.8 --output iris_classifier --verbose
+python cambium_cli.py quick-start --data iris.csv --features sepal_length,sepal_width,petal_length,petal_width --targets species --task classification --backend vitis_hls --precision 18.8 --output iris_classifier --verbose
 ```
 
 ```bash
-python fluidml_cli.py quick-start --data digits.csv --targets digit --task classification --backend vivado_hls --precision 18.8 --output digits_classifier --verbose
+python cambium_cli.py quick-start --data digits.csv --targets digit --task classification --backend vivado_hls --precision 18.8 --output digits_classifier --verbose
 ```
 
 Real-world HVAC regression example:
 
 ```bash
-python rf_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons,Therm_Eng_Cons,PMV --backend vivado_hls --precision 18.8 --output hvac_multi_target --verbose
+python cambium_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons,Therm_Eng_Cons,PMV --backend vivado_hls --precision 18.8 --output hvac_multi_target --verbose
 ```
 
 ### 2) Train only
 
 ```bash
-python fluidml_cli.py train --data data.csv --features f1,f2 --targets y --output out_dir --save-model model.pkl
+python cambium_cli.py train --data data.csv --features f1,f2 --targets y --output out_dir --save-model model.pkl
 ```
 
 ### 3) Export from saved model
 
 ```bash
-python fluidml_cli.py export --model model.pkl --output out_dir --backend vivado_hls
+python cambium_cli.py export --model model.pkl --output out_dir --backend vivado_hls
 ```
 
 ### 4) Create config template
 
 ```bash
-python fluidml_cli.py create-config --output fluidml_config.yaml
+python cambium_cli.py create-config --output cambium_config.yaml
 ```
 
 You can also keep precision in YAML:
@@ -153,20 +161,20 @@ export:
 ### 5) Print synthesis report summary
 
 ```bash
-python fluidml_cli.py hls-report --project-dir energy_pred/fluidml_project
+python cambium_cli.py hls-report --project-dir energy_pred/cambium_project
 ```
 
 ## Generated Output Files
 
 After a successful quick start, `energy_pred/` will include files such as:
 
-- `fluidml_model.pkl`
-- `fluidml_config.yaml`
-- `fluidml_metrics.json`
-- `fluidml_report.md`
+- `cambium_model.pkl`
+- `cambium_config.yaml`
+- `cambium_metrics.json`
+- `cambium_report.md`
 - `X_test.npy`, `Y_test.npy`, `Y_pred.npy`
 - generated firmware/test C++ and headers
-- `<project_name>.tcl` (default: `fluidml_project.tcl`)
+- `<project_name>.tcl` (default: `cambium_project.tcl`)
 - `vivado_block_design.tcl`
 
 ## HLS / FPGA Flow
@@ -175,13 +183,13 @@ After a successful quick start, `energy_pred/` will include files such as:
 
 ```bash
 cd energy_pred
-vivado_hls -f fluidml_project.tcl
+vivado_hls -f cambium_project.tcl
 ```
 
 Example generation command:
 
 ```bash
-python fluidml_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred_vivado --backend vivado_hls --precision 18.8 --verbose
+python cambium_cli.py quick-start --data https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv --features Occupancy,Rel_Hum,Room_Temp,Air_Flow_Rat,Air_Temp --targets Elec_Cons --output energy_pred_vivado --backend vivado_hls --precision 18.8 --verbose
 ```
 
 ### Bitstream generation (Vivado batch)
@@ -194,14 +202,14 @@ vivado -mode batch -source vivado_block_design.tcl
 ### Vitis HLS (optional)
 
 ```bash
-python fluidml_cli.py quick-start --data data.csv --features f1,f2 --targets y --backend vitis_hls --output out_vitis --precision 18.8
+python cambium_cli.py quick-start --data data.csv --features f1,f2 --targets y --backend vitis_hls --output out_vitis --precision 18.8
 ```
 
 Then run:
 
 ```bash
 cd out_vitis
-vitis_hls -f fluidml_project.tcl
+vitis_hls -f cambium_project.tcl
 ```
 
 Notes:
@@ -214,7 +222,7 @@ Notes:
 
 For a walkthrough covering end-to-end framework usage, open:
 
-- `FluidML_Tutorial_Regression_Iris_Digits.ipynb`
+- `Cambium_Tutorial_Regression_Iris_Digits.ipynb`
 
 The notebook covers:
 
@@ -227,9 +235,9 @@ The notebook covers:
 ## Python API Example
 
 ```python
-from fluidml import FluidMLFramework
+from cambium import CambiumFramework
 
-fw = FluidMLFramework()
+fw = CambiumFramework()
 fw.load_data(
     "https://raw.githubusercontent.com/AbuAli3/ee/main/alldata.csv",
     feature_cols=["Occupancy", "Rel_Hum", "Room_Temp", "Air_Flow_Rat", "Air_Temp"],

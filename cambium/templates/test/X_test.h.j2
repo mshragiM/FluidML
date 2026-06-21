@@ -1,0 +1,14 @@
+#ifndef X_TEST_H_
+#define X_TEST_H_
+
+#include "rfr_common.h"
+
+#define X_TEST_SAMPLES {{ x_test_samples }}
+
+static const feature_t X_test[{{ x_test_samples }}][N_FEATURES] = {
+{% for row in x_test_data %}
+    { {% for val in row %}{{ "%.6f"|format(val) }}f{% if not loop.last %}, {% endif %}{% endfor %} }{% if not loop.last %},{% endif %}
+{% endfor %}
+};
+
+#endif // X_TEST_H_

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""FluidML command line interface."""
+"""Cambium command line interface."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from typing import List, Optional
 
 import yaml
 
-from .framework import FluidMLFramework, create_sample_config
+from .framework import CambiumFramework, create_sample_config
 from .logos import get_logo
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def _parse_csv_columns(raw: Optional[str]) -> Optional[List[str]]:
     return values or None
 
 
-class FluidMLCLI:
+class CambiumCLI:
     def __init__(self):
         self.parser = self._create_parser()
 
@@ -68,7 +68,7 @@ class FluidMLCLI:
 
         return f"ap_fixed<{total_bits},{int_bits}>"
 
-    def _apply_precision_override(self, framework: FluidMLFramework, precision: Optional[str]) -> None:
+    def _apply_precision_override(self, framework: CambiumFramework, precision: Optional[str]) -> None:
         if not precision:
             return
 
@@ -83,24 +83,24 @@ class FluidMLCLI:
         verbosity_group.add_argument("--quiet", "-q", action="store_true", help="Suppress output")
 
         parser = argparse.ArgumentParser(
-            description="FluidML - Generate optimized ML inference code",
+            description="Cambium - Generate optimized ML inference code",
             formatter_class=argparse.RawDescriptionHelpFormatter,
             parents=[parent_parser],
             epilog="""
 Examples:
 
 # Vivado HLS (default)
-fluidml quick-start --data data.csv --features f1,f2 --targets t1 --output myproject
+cambium quick-start --data data.csv --features f1,f2 --targets t1 --output myproject
 
 # Vitis HLS
-fluidml quick-start --data data.csv --features f1,f2 --targets t1 --backend vitis_hls --output myproject
+cambium quick-start --data data.csv --features f1,f2 --targets t1 --backend vitis_hls --output myproject
 
 # With config file
-fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
+cambium quick-start --data data.csv --config cambium_config_vitis.yaml
             """,
         )
 
-        parser.add_argument("--version", action="version", version="FluidML 1.1")
+        parser.add_argument("--version", action="version", version="Cambium 1.1")
         subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
         self._add_train_parser(subparsers, parent_parser)
@@ -132,7 +132,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         )
 
         train_parser.add_argument("--config", "-c", help="Configuration file (YAML/JSON)")
-        train_parser.add_argument("--output", "-o", default="fluidml_output", help="Output directory")
+        train_parser.add_argument("--output", "-o", default="cambium_output", help="Output directory")
         train_parser.add_argument("--save-model", help="Save trained model to file")
         train_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="HLS synthesis backend")
 
@@ -140,7 +140,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         export_parser = subparsers.add_parser("export", help="Export trained model", parents=[parent_parser])
         export_parser.add_argument("--model", "-m", required=True, help="Path to trained model file")
         export_parser.add_argument("--target", choices=["hls"], default="hls", help="Export target format")
-        export_parser.add_argument("--output", "-o", default="fluidml_export", help="Output directory")
+        export_parser.add_argument("--output", "-o", default="cambium_export", help="Output directory")
         export_parser.add_argument("--export-format", choices=["default", "legacy"], default="legacy", help="Export format")
         export_parser.add_argument("--jinja2", action="store_true", help="Use Jinja2 templates")
         export_parser.add_argument(
@@ -153,7 +153,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
     def _add_quickstart_parser(self, subparsers, parent_parser) -> None:
         quick_parser = subparsers.add_parser("quick-start", help="Quick start with automatic configuration", parents=[parent_parser])
         quick_parser.add_argument("--data", "-d", help="Path to dataset file or URL (optional if provided in --config)")
-        quick_parser.add_argument("--output", "-o", default="fluidml_quickstart", help="Output directory")
+        quick_parser.add_argument("--output", "-o", default="cambium_quickstart", help="Output directory")
         quick_parser.add_argument("--features", "-f", help="Comma-separated list of feature columns")
         quick_parser.add_argument("--targets", "-t", help="Comma-separated list of target columns")
         quick_parser.add_argument("--export-format", choices=["default", "legacy"], default="legacy", help="Export format")
@@ -178,12 +178,12 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
     def _add_config_parser(self, subparsers, parent_parser) -> None:
         config_parser = subparsers.add_parser("create-config", help="Create configuration file", parents=[parent_parser])
         config_parser.add_argument("--template", choices=["default", "energy", "automotive"], default="default")
-        config_parser.add_argument("--output", "-o", default="fluidml_config.yaml", help="Output config file")
+        config_parser.add_argument("--output", "-o", default="cambium_config.yaml", help="Output config file")
         config_parser.add_argument("--backend", choices=["vivado_hls", "vitis_hls"], default="vivado_hls", help="Target HLS backend")
 
     def _add_synthesis_parser(self, subparsers, parent_parser) -> None:
         synth_parser = subparsers.add_parser("hls-report", help="Print Vivado/Vitis HLS synthesis summary", parents=[parent_parser])
-        synth_parser.add_argument("--project-dir", "-p", default="fluidml_output", help="HLS project directory")
+        synth_parser.add_argument("--project-dir", "-p", default="cambium_output", help="HLS project directory")
 
     def run(self, args=None) -> int:
         args = self.parser.parse_args(args)
@@ -223,12 +223,12 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
             force=True,
         )
 
-    def _build_framework(self, args) -> FluidMLFramework:
+    def _build_framework(self, args) -> CambiumFramework:
         if args.config:
-            framework = FluidMLFramework(args.config)
+            framework = CambiumFramework(args.config)
             logger.info("Using configuration from: %s", args.config)
         else:
-            framework = FluidMLFramework()
+            framework = CambiumFramework()
             framework.config.config["project"]["output_dir"] = args.output
             framework.config.config["export"]["format"] = getattr(args, "export_format", "legacy")
 
@@ -256,7 +256,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         return framework
 
     def _handle_train(self, args) -> int:
-        logger.info("FluidML Training")
+        logger.info("Cambium Training")
         logger.info("=" * 40)
         framework = self._build_framework(args)
 
@@ -281,7 +281,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         return 0
 
     def _handle_export(self, args) -> int:
-        logger.info("FluidML Export")
+        logger.info("Cambium Export")
         logger.info("=" * 40)
         model_path = Path(args.model)
         if not model_path.exists():
@@ -306,7 +306,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         return 0
 
     def _handle_quickstart(self, args) -> int:
-        logger.info("FluidML Quick Start")
+        logger.info("Cambium Quick Start")
         logger.info("=" * 40)
         framework = self._build_framework(args)
         if args.config:
@@ -365,7 +365,7 @@ fluidml quick-start --data data.csv --config fluidml_config_vitis.yaml
         return 0
 
     def _handle_create_config(self, args) -> int:
-        logger.info("FluidML Create Configuration")
+        logger.info("Cambium Create Configuration")
         create_sample_config(args.output)
 
         if args.backend != "vitis_hls":
@@ -419,8 +419,8 @@ def main(argv=None) -> int:
     try:
         print(get_logo("bold"))
     except UnicodeEncodeError:
-        print("FluidML")
-    cli = FluidMLCLI()
+        print("Cambium")
+    cli = CambiumCLI()
     try:
         return cli.run(argv)
     except KeyboardInterrupt:

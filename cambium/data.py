@@ -10,7 +10,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
-from .config import FluidMLConfig
+from .config import CambiumConfig
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class DataManager:
     """Handles data loading, preprocessing, and scaling."""
 
-    def __init__(self, config: FluidMLConfig):
+    def __init__(self, config: CambiumConfig):
         self.config = config
         self.scaler_x = None
         self.scaler_y = None

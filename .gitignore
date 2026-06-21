@@ -36,10 +36,10 @@ Thumbs.db
 
 # Local generated project outputs
 energy_pred/
-fluidml_output/
-fluidml_export/
-fluidml_quickstart/
-fluidml_project/
+cambium_output/
+cambium_export/
+cambium_quickstart/
+cambium_project/
 
 # Local synthesis/build artifacts
 *.log

@@ -1,0 +1,12 @@
+#ifndef RF_TREES_BRAM_H_
+#define RF_TREES_BRAM_H_
+
+#include "rfr_common.h"
+
+// BRAM storage for runtime-configurable trees
+extern TreeData bram_trees[{{ n_targets }} * {{ n_trees_per_target }}];
+
+// Initialize BRAM with zeros
+void init_bram_trees();
+
+#endif
