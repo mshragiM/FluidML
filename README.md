@@ -254,20 +254,3 @@ print(metrics)
 ## Author
 
 Mohammed Mshragi
-
-## Citation
-
-If you use this software in a publication, please cite the software:
-
-```bibtex
-@article{mshragi2026fastml,
-  title={FastML-GA: FPGA-accelerated machine learning for real-time energy HVAC optimization in buildings},
-  author={Mshragi, Mohammed and Petri, Ioan},
-  journal={Neural Computing and Applications},
-  volume={38},
-  number={2},
-  pages={25},
-  year={2026},
-  publisher={Springer}
-}
-```
